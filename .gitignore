@@ -59,9 +59,8 @@ bld/
 arduino-1.6.12/
 
 # API
-API/arduino
-API/python
-API/esp32
+api/
+doxyoutput/
 
 #log files
 *.log

@@ -155,6 +155,10 @@ if [ -z "$ARDMK_DIR" ]; then # ifndef ARDMK_DIR
 		pip3 install pyserial
 
 		pip3 install python-igraph
+
+        pip3 install exhale
+
+        pip3 install sphinx-rtd-theme
 	fi
 
 fi
