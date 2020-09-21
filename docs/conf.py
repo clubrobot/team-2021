@@ -55,7 +55,7 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../arduino/common/ PREDEFINED += DOXYGEN_SHOULD_SKIP_THIS"
+    "exhaleDoxygenStdin":    "INPUT = ../arduino/common/ ../esp32/common/ PREDEFINED += DOXYGEN_SHOULD_SKIP_THIS"
 }
 
 # Tell sphinx what the primary language being documented is.
