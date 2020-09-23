@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <ShiftRegister.h>
 #include "VL53L0X_Commons.h"
 
 #define VL53L0X_I2C_ADDR 0X29
@@ -10,7 +11,7 @@
 class VL53L0X
 {
 public:
-    VL53L0X(uint8_t i2c_addr = VL53L0X_I2C_ADDR, uint8_t shutdown_pin = 0, TwoWire *i2c = &Wire);
+    VL53L0X(uint8_t i2c_addr = VL53L0X_I2C_ADDR, uint8_t shutdown_pin = NULL, TwoWire *i2c = &Wire, ShiftRegister *shift_reg = NULL);
 
     void shutdown();
     bool begin(bool io_2v8 = true);
@@ -92,6 +93,7 @@ private:
     uint16_t _previousRange = 65535;
 
     TwoWire *_i2c;
+    ShiftRegister *_shift_reg;
 };
 
 #endif /* __VL53L0X_H */

@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <ShiftRegister.h>
 #include "VL6180X_Commons.h"
 
 #define VL6180X_I2C_ADDR 0X29
@@ -10,7 +11,7 @@
 class VL6180X
 {
 public:
-    VL6180X(uint8_t i2c_addr = VL6180X_I2C_ADDR, uint8_t shutdown_pin = 0, TwoWire *i2c = &Wire);
+    VL6180X(uint8_t i2c_addr = VL6180X_I2C_ADDR, uint8_t shutdown_pin = NULL, TwoWire *i2c = &Wire, ShiftRegister *shift_reg = NULL);
 
     void shutdown();
     bool begin();
@@ -63,6 +64,7 @@ private:
     bool _did_timeout;
 
     TwoWire *_i2c;
+    ShiftRegister *_shift_reg;
 };
 
 #endif

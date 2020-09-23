@@ -8,8 +8,8 @@ static uint16_t const ScalerValues[] = {0, 253, 127, 84};
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-VL6180X::VL6180X(uint8_t i2c_addr, uint8_t shutdown_pin, TwoWire *i2c)
-    : _i2c_addr(i2c_addr), _shutdown_pin(shutdown_pin), _i2c(i2c)
+VL6180X::VL6180X(uint8_t i2c_addr, uint8_t shutdown_pin, TwoWire *i2c, ShiftRegister *shift_reg)
+    : _i2c_addr(i2c_addr), _shutdown_pin(shutdown_pin), _i2c(i2c), _shift_reg(shift_reg)
 {
     _scaling = 0;
     _ptp_offset = 0;
@@ -39,10 +39,17 @@ void VL6180X::load_tunning_settings()
 void VL6180X::shutdown()
 {
     /* always shutdown the sensor at the beggining */
-    if (_shutdown_pin != 0)
+    if (_shutdown_pin != NULL)
     {
-        pinMode(_shutdown_pin, OUTPUT);
-        digitalWrite(_shutdown_pin, LOW);
+        if (_shift_reg != NULL)
+        {
+            _shift_reg->SetLow(_shutdown_pin);
+        }
+        else
+        {
+            pinMode(_shutdown_pin, OUTPUT);
+            digitalWrite(_shutdown_pin, LOW);
+        }
     }
 }
 
@@ -50,10 +57,19 @@ void VL6180X::shutdown()
 // "Mandatory : private registers"
 bool VL6180X::begin()
 {
-    if (_shutdown_pin != 0)
+    /* enable the sensor */
+    if (_shutdown_pin != NULL)
     {
-        digitalWrite(_shutdown_pin, HIGH);
-        delay(2);
+        if (_shift_reg != NULL)
+        {
+            _shift_reg->SetHigh(_shutdown_pin);
+            delay(2);
+        }
+        else
+        {
+            digitalWrite(_shutdown_pin, HIGH);
+            delay(2);
+        }
     }
     setAddress(_i2c_addr);
     // Store part-to-part range offset so it can be adjusted if scaling is changed
