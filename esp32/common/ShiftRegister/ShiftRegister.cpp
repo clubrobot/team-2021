@@ -1,14 +1,6 @@
 #include "ShiftRegister.h"
 #include <Arduino.h>
 
-//global instace
-
-ShiftRegister::ShiftRegister()
-{
-    // Default shift register size
-    m_size = 7;
-}
-
 void ShiftRegister::attach(uint8_t latchpin, uint8_t clockpin, uint8_t datapin)
 {
     m_LATCH = latchpin;

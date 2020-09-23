@@ -14,7 +14,10 @@ LIBS =  $(ESP_LIBS)/EEPROM \
 		topics.cpp \
 		$(COMMON)/SerialTalks \
 		$(COMMON)/CRC16 \
-		$(COMMON)/SerialTopics
+		$(COMMON)/SerialTopics \
+		$(COMMON)/ShiftRegister \
+		$(COMMON)/VL6180X \
+		$(COMMON)/VL53L0X
 # Define
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
 

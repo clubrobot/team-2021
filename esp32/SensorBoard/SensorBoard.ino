@@ -2,9 +2,14 @@
 
 #include "instructions.h"
 #include "topics.h"
+#include "PIN.h"
+#include "constants.h"
 
 #include <SerialTalks.h>
 #include <SerialTopics.h>
+#include <ShiftRegister.h>
+
+ShiftRegister shutdown_register(SHIFT_REG_SIZE);
 
 void setup()
 {
