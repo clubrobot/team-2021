@@ -8,8 +8,8 @@ static uint16_t const ScalerValues[] = {0, 253, 127, 84};
 
 // Constructors ////////////////////////////////////////////////////////////////
 
-VL6180X::VL6180X(uint8_t i2c_addr, uint8_t shutdown_pin, TwoWire *i2c, ShiftRegister *shift_reg)
-    : _i2c_addr(i2c_addr), _shutdown_pin(shutdown_pin), _i2c(i2c), _shift_reg(shift_reg)
+VL6180X::VL6180X(uint8_t i2c_addr, uint8_t shutdown_pin, ShiftRegister *shift_reg, TwoWire *i2c)
+    : _i2c_addr(i2c_addr), _shutdown_pin(shutdown_pin), _shift_reg(shift_reg), _i2c(i2c)
 {
     _scaling = 0;
     _ptp_offset = 0;

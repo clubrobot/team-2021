@@ -21,8 +21,8 @@
     PLL_period_ps = 1655; macro_period_vclks = 2304 */
 #define calcMacroPeriod(vcsel_period_pclks) ((((uint32_t)2304 * (vcsel_period_pclks)*1655) + 500) / 1000)
 
-VL53L0X::VL53L0X(uint8_t i2c_addr, uint8_t shutdown_pin, TwoWire *i2c, ShiftRegister *shift_reg)
-    : _i2c_addr(i2c_addr), _shutdown_pin(shutdown_pin), _i2c(i2c), _shift_reg(shift_reg)
+VL53L0X::VL53L0X(uint8_t i2c_addr, uint8_t shutdown_pin, ShiftRegister *shift_reg, TwoWire *i2c)
+    : _i2c_addr(i2c_addr), _shutdown_pin(shutdown_pin), _shift_reg(shift_reg), _i2c(i2c)
 {
     _io_timeout = 0;
     _did_timeout = false;

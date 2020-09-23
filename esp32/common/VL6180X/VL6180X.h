@@ -11,7 +11,7 @@
 class VL6180X
 {
 public:
-    VL6180X(uint8_t i2c_addr = VL6180X_I2C_ADDR, uint8_t shutdown_pin = NULL, TwoWire *i2c = &Wire, ShiftRegister *shift_reg = NULL);
+    VL6180X(uint8_t i2c_addr = VL6180X_I2C_ADDR, uint8_t shutdown_pin = NULL, ShiftRegister *shift_reg = NULL, TwoWire *i2c = &Wire);
 
     void shutdown();
     bool begin();
