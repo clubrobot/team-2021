@@ -5,14 +5,10 @@ CHIP = esp32
 SKETCH = main.ino
 
 BOARD_UUID = VL53L0X
-COMMON = ../common
+COMMON = ../../common
 #Setup all libs used !
 LIBS = 	$(ESP_LIBS)/EEPROM \
 		$(ESP_LIBS)/WIRE \
-		$(COMMON)/SerialTalks \
-		$(COMMON)/CRC16 \
-		$(COMMON)/TaskManager \
-		$(COMMON)/VL53L0X
 
 
 CPPFLAGS = -fexceptions
@@ -22,7 +18,7 @@ CPPFLAGS += -DVL53L0X_LOG
 CPPFLAGS += -DUSE_I2C_2V8
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
-MODULEMK_DIR = ..
+MODULEMK_DIR = ../..
 CPP_EXTRA += -fexceptions
 include $(MODULEMK_DIR)/Module.mk
 
