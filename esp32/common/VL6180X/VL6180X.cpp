@@ -15,6 +15,7 @@ VL6180X::VL6180X(uint8_t i2c_addr, uint8_t shutdown_pin, ShiftRegister *shift_re
     _ptp_offset = 0;
     _io_timeout = 0;
     _did_timeout = false;
+    _init_state = false;
 }
 
 // Public Methods //////////////////////////////////////////////////////////////
@@ -109,6 +110,9 @@ bool VL6180X::begin()
         // be resolved by resetting the sensor and Arduino again.
         _ptp_offset *= _scaling;
     }
+
+    _init_state = true;
+
     return true;
 }
 

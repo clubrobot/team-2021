@@ -16,6 +16,8 @@ public:
     void shutdown();
     bool begin(bool io_2v8 = true);
 
+    bool isInitialised() { return _init_state; }
+
     inline uint8_t get_last_status() { return _last_status; }
 
     inline uint8_t getAddress() { return _i2c_addr; }
@@ -82,6 +84,7 @@ private:
     uint8_t _i2c_addr;     // I2C device adress
     uint8_t _last_status;  // status of last I2C transmission
     uint8_t _shutdown_pin; // VL53L0X shutdown pin
+    bool _init_state;      // initialisation status
 
     uint16_t _io_timeout;
     bool _did_timeout;

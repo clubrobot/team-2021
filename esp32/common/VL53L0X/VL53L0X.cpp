@@ -26,6 +26,7 @@ VL53L0X::VL53L0X(uint8_t i2c_addr, uint8_t shutdown_pin, ShiftRegister *shift_re
 {
     _io_timeout = 0;
     _did_timeout = false;
+    _init_state = false;
 }
 
 void VL53L0X::shutdown()
@@ -164,6 +165,8 @@ bool VL53L0X::begin(bool io_2v8)
 
     /* "restore the previous Sequence Config" */
     writeReg(VL53L0X_SYSTEM_SEQUENCE_CONFIG, 0xE8);
+
+    _init_state = true;
 
     return true;
 }
