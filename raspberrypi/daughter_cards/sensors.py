@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from common.serialutils import Deserializer
-from daughter_cards.arduino import ArduinoLocal, TopicHandler, SHORT, BYTE
+from daughter_cards.arduino import SecureArduino, TopicHandler, SHORT, BYTE
 import time
 
 # Instructions
@@ -20,24 +20,24 @@ CHECK_ERROR_OPCODE = 0X18
 GET_ALL_TOPIC_OPCODE = 0x01
 
 
-class Sensors(ArduinoLocal):
+class Sensors(SecureArduino):
     TIMESTEP = 200
     MAX_DIST = 1000
-    # DEFAULT = {GET_SENSOR1_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR2_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR3_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR4_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR5_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR6_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR7_OPCODE: Deserializer(SHORT(MAX_DIST)),
-    #            GET_SENSOR8_OPCODE: Deserializer(SHORT(MAX_DIST)), }
+    DEFAULT = {GET_SENSOR1_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR2_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR3_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR4_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR5_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR6_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR7_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR8_OPCODE: Deserializer(SHORT(MAX_DIST)), }
 
-    def __init__(self, uuid='SensorBoard'):
-        ArduinoLocal.__init__(self,  uuid)
+    def __init__(self, parent, uuid='SensorBoard'):
+        SecureArduino.__init__(self, parent, uuid, default_result=self.DEFAULT)
         self.last_time = None
 
         self.addTopic(GET_ALL_TOPIC_OPCODE,
-                      self.get_all_sensors_handler, "sensor", self.TIMESTEP)
+                      self.get_all_sensors_handler, "sensors", self.TIMESTEP)
 
         self.sensor1 = self.MAX_DIST
         self.sensor2 = self.MAX_DIST
@@ -99,8 +99,7 @@ class Sensors(ArduinoLocal):
 
 
 if __name__ == "__main__":
-    # from setups.setup_serialtalks import *
+    from setups.setup_serialtalks import *
 
-    s = Sensors('/dev/tty.SLAB_USBtoUART')
-    s.connect()
-    s.subscribeSensor()
+    s = Sensors(manager, '/dev/tty.SLAB_USBtoUART')
+    s.subscribeSensors()
