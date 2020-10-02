@@ -3,11 +3,8 @@
 
 #include <SerialTalks.h>
 
-#define ON_OPCODE 0X10
-#define OFF_OPCODE 0X11
+#define CHECK_ERROR_OPCODE 0x18
 
-void ON(SerialTalks &inst, Deserializer &input, Serializer &output);
-
-void OFF(SerialTalks &inst, Deserializer &input, Serializer &output);
+void CHECK_ERROR(SerialTalks &inst, Deserializer &input, Serializer &output);
 
 #endif // __INSTRUCTIONS_H__

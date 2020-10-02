@@ -2,9 +2,18 @@
 
 #include <SerialTalks.h>
 
-static int i = 0;
+static uint16_t i = 0;
 
-void SUBSCRIPTION(Serializer &output)
+void GET_ALL(Serializer &output)
 {
-    output.write<int>(i++);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+    output.write<uint16_t>(i);
+
+    i++;
 }

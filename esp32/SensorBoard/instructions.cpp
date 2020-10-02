@@ -2,12 +2,10 @@
 
 #include <SerialTalks.h>
 
-void ON(SerialTalks &inst, Deserializer &input, Serializer &output)
+void CHECK_ERROR(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
-    digitalWrite(2, HIGH);
-}
+    uint8_t error = 0;
 
-void OFF(SerialTalks &inst, Deserializer &input, Serializer &output)
-{
-    digitalWrite(2, LOW);
+    error |= (1 << 1);
+    output.write<uint8_t>(error);
 }

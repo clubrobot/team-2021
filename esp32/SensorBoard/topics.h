@@ -3,8 +3,8 @@
 
 #include <SerialTalks.h>
 
-#define SUBSCRIPTION_OPCODE 0X01
+#define GET_ALL_OPCODE 0X01
 
-void SUBSCRIPTION(Serializer &output);
+void GET_ALL(Serializer &output);
 
 #endif // __SUBSCRIPTION_H__

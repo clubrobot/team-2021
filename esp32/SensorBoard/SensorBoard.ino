@@ -46,14 +46,13 @@ void setup()
     topics.begin(talks);
 
     // bind functions
-    talks.bind(ON_OPCODE, ON);
-    talks.bind(OFF_OPCODE, OFF);
+    talks.bind(CHECK_ERROR_OPCODE, CHECK_ERROR);
 
     //bind subscription
-    topics.bind(SUBSCRIPTION_OPCODE, SUBSCRIPTION);
+    topics.bind(GET_ALL_OPCODE, GET_ALL);
 
     // Shutdown all VL53L0X sensors
-    vl53_1.shutdown();
+    // vl53_1.shutdown();
     // vl53_2.shutdown();
     // vl53_3.shutdown();
     // vl53_4.shutdown();
@@ -73,7 +72,7 @@ void setup()
     // vl61_8.shutdown();
 
     // Starting all VL53L0X sensors
-    vl53_1.begin();
+    // vl53_1.begin();
     // vl53_2.begin();
     // vl53_3.begin();
     // vl53_4.begin();
@@ -93,7 +92,7 @@ void setup()
     // vl61_8.begin();
 
     // Set all VL53L0X timeout in ms
-    vl53_1.setTimeout(30);
+    // vl53_1.setTimeout(30);
     // vl53_2.setTimeout(30);
     // vl53_3.setTimeout(30);
     // vl53_4.setTimeout(30);
@@ -123,7 +122,7 @@ void setup()
     // vl61_8.configureDefault();
 
     // Starting all VL53L0X measure
-    vl53_1.startContinuous();
+    // vl53_1.startContinuous();
     // vl53_2.startContinuous();
     // vl53_3.startContinuous();
     // vl53_4.startContinuous();
@@ -147,9 +146,9 @@ void setup()
 
 void loop()
 {
-    // talks.execute();
-    // topics.execute();
+    talks.execute();
+    topics.execute();
 
     // Debug
-    Serial.println(vl53_1.readRangeContinuousMillimeters());
+    // Serial.println(vl53_1.readRangeContinuousMillimeters());
 }
