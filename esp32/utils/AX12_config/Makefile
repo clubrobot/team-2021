@@ -5,7 +5,7 @@ CHIP = esp32
 SKETCH = main.ino
 
 BOARD_UUID = AX12_CONFIG
-COMMON = ../common
+COMMON = ../../common
 #Setup all libs used !
 LIBS = 	$(ESP_LIBS)/EEPROM \
 		$(COMMON)/SerialTalks \
@@ -18,7 +18,7 @@ CPPFLAGS += -DCONFIG_CXX_EXCEPTIONS=1
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
 # Congratulations! You made a pretty Makefile :)
 # Now let the grown-ups do the hard work :D
-MODULEMK_DIR = ..
+MODULEMK_DIR = ../..
 CPP_EXTRA += -fexceptions
 include $(MODULEMK_DIR)/Module.mk
 

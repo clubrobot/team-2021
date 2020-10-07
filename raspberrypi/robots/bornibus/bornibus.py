@@ -5,6 +5,7 @@ from robots.bornibus.setup_bornibus import *
 from behaviours.robot_behaviour import RobotBehavior
 from behaviours.avoidance_behaviour import AviodanceBehaviour
 from robots.bornibus.actions.take_cup_action import TakeCup
+from robots.bornibus.actions.harbour_action import Harbour
 from math import pi
 COLOR = RobotBehavior.YELLO_SIDE
 PREPARATION = False
@@ -16,7 +17,7 @@ class Bornibus(RobotBehavior):
                                timelimit=timelimit, **kwargs)
 
         self.avoidance_behaviour = AviodanceBehaviour(
-            wheeledbase, roadmap, robot_beacon)
+            wheeledbase, roadmap, robot_beacon, sensors)
 
         self.wheeledbase = wheeledbase
 
@@ -26,12 +27,15 @@ class Bornibus(RobotBehavior):
         take4 = TakeCup(geogebra, 4)
         take5 = TakeCup(geogebra, 5)
 
+        self.harbour = Harbour(geogebra, "Yellow")
+
         self.automate = [
             take5,
             take1,
             take2,
             take3,
             take4,
+            self.harbour
         ]
 
         self.automatestep = 0

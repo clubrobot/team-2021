@@ -11,7 +11,7 @@ from common.sync_flag_signal import Signal, Flag
 class SensorListener(Thread):
 
     FRONT = 0
-    LEFT  = 1
+    LEFT = 1
     RIGHT = 2
 
     def __init__(self, front_getter, left_getter, right_getter, timestep=0.1, threshold=220):
@@ -22,14 +22,14 @@ class SensorListener(Thread):
         self.sensors_list = [self.LEFT, self.FRONT, self.RIGHT]
 
         # Signals for each sensors
-        self.__setattr__("signal"+str(self.FRONT) , Signal())
-        self.__setattr__("signal"+str(self.LEFT)  , Signal())
-        self.__setattr__("signal"+str(self.RIGHT) , Signal())
+        self.__setattr__("signal"+str(self.FRONT), Signal())
+        self.__setattr__("signal"+str(self.LEFT), Signal())
+        self.__setattr__("signal"+str(self.RIGHT), Signal())
 
         # Sensors getter
-        self.__setattr__("getter"+str(self.FRONT) , front_getter)
-        self.__setattr__("getter"+str(self.LEFT)  , left_getter)
-        self.__setattr__("getter"+str(self.RIGHT) , left_getter)
+        self.__setattr__("getter"+str(self.FRONT), front_getter)
+        self.__setattr__("getter"+str(self.LEFT), left_getter)
+        self.__setattr__("getter"+str(self.RIGHT), right_getter)
 
         # Timestep
         self.timestep = timestep
@@ -45,7 +45,8 @@ class SensorListener(Thread):
 
     def bind(self, idx, func):
         self.__setattr__("flag"+str(idx), Flag(func))
-        self.__getattribute__("flag"+str(idx)).bind(self.__getattribute__("signal"+str(idx)))
+        self.__getattribute__(
+            "flag"+str(idx)).bind(self.__getattribute__("signal"+str(idx)))
 
     def _handle_sensor(self, idx):
         try:
@@ -55,7 +56,6 @@ class SensorListener(Thread):
 
         if a < self.threshold or b < self.threshold:
             self.__getattribute__("signal"+str(idx)).ping()
-
 
     def run(self):
         while not self.stop.is_set():
