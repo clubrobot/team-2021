@@ -10,25 +10,29 @@ from common.sync_flag_signal import Signal, Flag
 
 class SensorListener(Thread):
 
-    FRONT = 0
-    LEFT = 1
-    RIGHT = 2
+    LEFT = 0
+    MID_LEFT = 1
+    MID_RIGHT = 3
+    RIGHT = 4
 
-    def __init__(self, front_getter, left_getter, right_getter, timestep=0.1, threshold=220):
+    def __init__(self, left_getter, mid_left_getter, mid_right_getter, right_getter, timestep=0.1, threshold=220):
         Thread.__init__(self)
         self.daemon = True
 
         # Sensors list
-        self.sensors_list = [self.LEFT, self.FRONT, self.RIGHT]
+        self.sensors_list = [self.LEFT,
+                             self.MID_LEFT, self.MID_RIGHT, self.RIGHT]
 
         # Signals for each sensors
-        self.__setattr__("signal"+str(self.FRONT), Signal())
         self.__setattr__("signal"+str(self.LEFT), Signal())
+        self.__setattr__("signal"+str(self.MID_LEFT), Signal())
+        self.__setattr__("signal"+str(self.MID_RIGHT), Signal())
         self.__setattr__("signal"+str(self.RIGHT), Signal())
 
         # Sensors getter
-        self.__setattr__("getter"+str(self.FRONT), front_getter)
         self.__setattr__("getter"+str(self.LEFT), left_getter)
+        self.__setattr__("getter"+str(self.MID_LEFT), mid_left_getter)
+        self.__setattr__("getter"+str(self.MID_RIGHT), mid_right_getter)
         self.__setattr__("getter"+str(self.RIGHT), right_getter)
 
         # Timestep
@@ -64,3 +68,9 @@ class SensorListener(Thread):
                 self._handle_sensor(sensor)
 
             sleep(self.timestep)
+
+
+if __name__ == "__main__":
+
+    s = SensorListener(lambda: (1000, 1000), lambda: (500, 500),
+                       lambda: (200, 200), lambda: (100, 100))
