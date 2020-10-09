@@ -20,6 +20,7 @@ class Bornibus(RobotBehavior):
             wheeledbase, roadmap, robot_beacon, sensors)
 
         self.wheeledbase = wheeledbase
+        self.display = display
 
         take1 = TakeCup(geogebra, 1)
         take2 = TakeCup(geogebra, 2)
@@ -44,16 +45,19 @@ class Bornibus(RobotBehavior):
         if(self.automatestep < len(self.automate)):
             action = self.automate[self.automatestep]
         else:
-            return None, (self,), {}, (None, None)
+            self.display.love()
             self.stop_event.set()
+            return None, (self,), {}, (None, None)
 
         return action.procedure, (self,), {}, (action.actionpoint + (action.orientation,), (action.actionpoint_precision, None))
 
     def goto_procedure(self, destination, thresholds=(None, None)):
         if self.avoidance_behaviour.move(destination, thresholds):
+            self.display.happy()
             self.automatestep += 1
             return True
         else:
+            self.display.surprised()
             return False
 
     def set_side(self, side):
