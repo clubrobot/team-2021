@@ -22,6 +22,9 @@ class Bornibus(RobotBehavior):
         self.wheeledbase = wheeledbase
         self.display = display
 
+        # Default side
+        self.side = self.YELLO_SIDE
+
         take1 = TakeCup(geogebra, 1)
         take2 = TakeCup(geogebra, 2)
         take3 = TakeCup(geogebra, 3)
@@ -61,10 +64,13 @@ class Bornibus(RobotBehavior):
             return False
 
     def set_side(self, side):
-        pass
+        self.side = side
 
     def set_position(self):
-        wheeledbase.set_position(*geogebra.get('StartYellow'), -pi/2)
+        if self.side == self.YELLO_SIDE:
+            wheeledbase.set_position(*geogebra.get('StartYellow'), -pi/2)
+        else :
+            wheeledbase.set_position(*geogebra.get('StartBlue'), pi/2)
 
     def positioning(self):
         pass
