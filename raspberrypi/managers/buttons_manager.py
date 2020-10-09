@@ -27,7 +27,7 @@ class ButtonsManager:
         self.logger(INFO, "Team Stage")
         ssd.set_message("set team")
         self.blue.set_function(
-            Thread(target=self.set_team_purple, daemon=True).start)
+            Thread(target=self.set_team_blue, daemon=True).start)
         self.orange.set_function(
             Thread(target=self.set_team_yellow, daemon=True).start)
 
@@ -38,7 +38,7 @@ class ButtonsManager:
         self.green.set_function(
             Thread(target=self.odometry_stage, daemon=True).start)
 
-    def set_team_purple(self):
+    def set_team_blue(self):
         self.logger(INFO, "Blue Team")
         self.side = RobotBehavior.BLUE_SIDE
         ssd.set_message("team : b")
