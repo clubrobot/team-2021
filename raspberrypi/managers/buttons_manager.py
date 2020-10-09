@@ -97,7 +97,7 @@ class ButtonsManager:
         self.orange.close()
         self.green.close()
 
-        Thread(target=self.auto.run(), daemon=True).start()
+        Thread(target=self.auto.start(), daemon=True).start()
         self.p.release()
 
     def __init__(self, auto):
