@@ -9,7 +9,7 @@ void setup()
 {
   // Communication
   Serial.begin(SERIALTALKS_BAUDRATE);
-  //talks.begin(Serial);
+  talks.begin(Serial);
   pinMode(2, OUTPUT);
   if (color_sensor.begin()) {
     digitalWrite(2, HIGH);
@@ -22,15 +22,15 @@ void setup()
 
 void loop()
 {
+  talks.execute();
   float red, green, blue;
   delay(60);  // takes 50ms to read
 
   color_sensor.getRGB(&red, &green, &blue);
-  //talks.execute();
 
-  Serial.print("R:\t"); Serial.print(int(red));
-  Serial.print("\tG:\t"); Serial.print(int(green));
-  Serial.print("\tB:\t"); Serial.print(int(blue));
+  Serial.print("R: "); Serial.print(int(red));
+  Serial.print("\tG: "); Serial.print(int(green));
+  Serial.print("\tB: "); Serial.print(int(blue));
 
   Serial.print("\n");
 }
