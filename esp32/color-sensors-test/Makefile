@@ -13,7 +13,9 @@ LIBS =  $(ESP_LIBS)/EEPROM \
         $(ESP_LIBS)/Wire \
         $(COMMON)/SerialTalks \
         $(COMMON)/CRC16 \
-        $(COMMON)/TCS34725
+        $(COMMON)/TCA9548A \
+        $(COMMON)/TCS34725 \
+        $(COMMON)/ColorSensors
 # Define
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
 
