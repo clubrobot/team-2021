@@ -18,9 +18,9 @@ class TCA9548A {
    * always 1110, the 3 remaining are hardware selectable using the A2, A1 and
    * A0 pins.
    */
-  void begin(uint8_t reset_pin, uint8_t address = TCA9548A_DEFAULT_ADDRESS, TwoWire *wire = &Wire);
-  uint8_t get_selected_channels() const;
-  void set_selected_channels(uint8_t channels);
+  bool begin(uint8_t reset_pin, uint8_t address = TCA9548A_DEFAULT_ADDRESS, TwoWire *wire = &Wire);
+  uint8_t get_selected_channels(uint8_t *channels) const;
+  uint8_t set_selected_channels(uint8_t channels);
   TwoWire *get_wire();
 
   /**
