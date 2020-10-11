@@ -6,7 +6,7 @@ PART_FILE=$(ESP_ROOT)/tools/partitions/default.csv
 #Arduino file
 SKETCH = color-sensors-test.ino
 
-BOARD_UUID = wheeledbase
+BOARD_UUID = ColorSensors
 COMMON = ../common
 #Setup all libs used !
 LIBS =  $(ESP_LIBS)/EEPROM \
@@ -15,7 +15,8 @@ LIBS =  $(ESP_LIBS)/EEPROM \
         $(COMMON)/CRC16 \
         $(COMMON)/TCA9548A \
         $(COMMON)/TCS34725 \
-        $(COMMON)/ColorSensors
+        $(COMMON)/ColorSensors \
+				instructions.cpp
 # Define
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
 
