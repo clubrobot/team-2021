@@ -34,7 +34,19 @@ _GET_EYE_FINAL_ORIENTATION_OPCODE = 0x82
 
 
 class ClientGS(TCPTalks):
+    """The Global sync client is used to interconnect robots or beacon using TCPTalks protocol
+
+    Args:
+        TCPTalks (class): The TCPTalks client class
+    """
     def __init__(self, ID, ip="192.168.12.1", port=_BEACON_PORT):
+        """Initialize the client with its id and ip,port. The id is the robot or beacon id (ex: _BORNIBUS_ID)
+
+        Args:
+            ID (int): Robot or beacon id
+            ip (str, optional): The server ip. Defaults to "192.168.12.1".
+            port (int, optional): The server port. Defaults to _BEACON_PORT.
+        """
         TCPTalks.__init__(self, ip=ip, port=port, id=ID)
         self.logger = LogManager().getlogger("ClientGS", Logger.WRITE, level_disp=INFO)
         self.bind(_PING_OPCODE, self._refresh)
@@ -42,15 +54,30 @@ class ClientGS(TCPTalks):
         self.bind(_GET_EYE_FINAL_ORIENTATION_OPCODE, self._get_my_final_orientation)
 
     def reset_ressources(self):
+        """Reset all server ressources
+        """
         self.send(_RESET_OPCODE)
 
     def get_ressource(self, name):
+        """Distributed mutex to lock resources on the server (ex: access to a shared action)
+
+        Args:
+            name (string): The ressource name
+
+        Returns:
+            Bool: Exist or not
+        """
         try:
             return self.execute(_GET_RESSOURCE_OPCODE, self.id, name)
         except:
             return False
 
     def release_ressource(self, name):
+        """Distributed mutex to unlock resources on the server (ex: access to a shared action)
+
+        Args:
+            name (string): The ressource name
+        """
         try:
             self.send(_RELEASE_RESSOURCE_OPCODE, self.id, name)
         except:
@@ -60,6 +87,11 @@ class ClientGS(TCPTalks):
                 pass
 
     def is_active(self):
+        """Check if the client and server is connected
+
+        Returns:
+            bool : Connected or not
+        """
         if not self.is_connected:
             return False
         try:
@@ -68,25 +100,60 @@ class ClientGS(TCPTalks):
             return False
 
     def _refresh(self):
+        """Refresh
+
+        Returns:
+            Bool : true
+        """
         return True
 
     def get_brother_pos(self):
+        """Get the pos of our brother robot in order to avoid it
+
+        Returns:
+            tuple: The brother x, y, theta position
+        """
         other = _BORNIBUS_ID if self.id == _R128_ID else _R128_ID
         return self.execute(_GET_OTHER_OPCODE, other)
 
     def get_opponents_pos(self):
+        """Get the opponent pos from the supervior beacon that can detect oppoenets whith the ArUco tags
+
+        Returns:
+            list of tuple: The the all opponents [(x, y, theta), (x, y, theta)] position
+        """
         return self.execute(_GET_OPPONENTS_POS_OPCODE)
 
     def _get_my_pos(self):
+        """Internal method to give my pos to my brother, by default, return my pos outise of the game area, it can be redefined by the Robot Client
+
+        Returns:
+            tuple: my x, y, theta position
+        """
         return (-1000, -1000+self.id)
 
     def get_side(self):
+        """Get the side configured on the robot
+
+        Returns:
+            int : Side color
+        """
         return self.execute(_GET_SIDE_OPCODE)
 
     def _get_my_final_orientation(self):
-            return None
+        """Used internally to return the wheatervane orientation, redifined by EY
+
+        Returns:
+            None
+        """
+        return None
 
     def get_final_orientation(self):
+        """Get final wheathervane orientation
+
+        Returns:
+            int: the orientation
+        """
         return self.execute(_GET_EYE_FINAL_ORIENTATION_OPCODE)
 
 
