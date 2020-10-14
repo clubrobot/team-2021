@@ -14,19 +14,21 @@ void setup()
   Serial.begin(SERIALTALKS_BAUDRATE);
   talks.begin(Serial);
 
-  pinMode(2, OUTPUT);
-  digitalWrite(2, LOW);
   // Fake reset pin. Should return false.
-  /*color_sensor_array_mux.begin(34);
+  color_sensor_array_mux.begin(34);
   color_sensor_array.begin(&color_sensor_array_mux, 23);
-  if (color_sensor_array.begin(1)) {
-    digitalWrite(2, HIGH);
+  if (!color_sensor_array.begin(1)) {
+    // ERROR.
   }
-  color_sensor_array.setIntegrationTime(1, TCS34725_INTEGRATIONTIME_700MS);*/
 
   // bind functions
-  talks.bind(ON_OPCODE, ON);
-  talks.bind(OFF_OPCODE, OFF);
+  talks.bind(CSA_GET_RGB_OPCODE, CSA_GET_RGB);
+  talks.bind(CSA_SET_INTEGRATION_TIME_OPCODE, CSA_SET_INTEGRATION_TIME);
+  talks.bind(CSA_SET_GAIN_OPCODE, CSA_SET_GAIN);
+  talks.bind(CSA_ENABLE_OPCODE, CSA_ENABLE);
+  talks.bind(CSA_DISABLE_OPCODE, CSA_DISABLE);
+  talks.bind(CSA_LEDS_ON_OPCODE, CSA_LEDS_ON);
+  talks.bind(CSA_LEDS_OFF_OPCODE, CSA_LEDS_OFF);
 }
 
 void loop()
