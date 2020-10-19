@@ -63,28 +63,28 @@ class Sensors(SecureArduino):
         return [self.sensor1, self.sensor2, self.sensor3, self.sensor4, self.sensor5, self.sensor6, self.sensor7, self.sensor8]
 
     def get_range1(self):
-        return self.sensor1
+        return self.sensor1, 65535
 
     def get_range2(self):
-        return self.sensor2
+        return self.sensor2, 65535
 
     def get_range3(self):
-        return self.sensor3
+        return self.sensor3, 65535
 
     def get_range4(self):
-        return self.sensor4
+        return self.sensor4, 65535
 
     def get_range5(self):
-        return self.sensor5
+        return self.sensor5, 65535
 
     def get_range6(self):
-        return self.sensor6
+        return self.sensor6, 65535
 
     def get_range7(self):
-        return self.sensor7
+        return self.sensor7, 65535
 
     def get_range8(self):
-        return self.sensor8
+        return self.sensor8, 65535
 
     def is_ready(self):
         try:

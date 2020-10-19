@@ -56,6 +56,15 @@ void setup()
     topics.begin(talks);
 
     // bind functions
+    talks.bind(GET_SENSOR1_OPCODE, GET_SENSOR1);
+    talks.bind(GET_SENSOR2_OPCODE, GET_SENSOR2);
+    talks.bind(GET_SENSOR3_OPCODE, GET_SENSOR3);
+    talks.bind(GET_SENSOR4_OPCODE, GET_SENSOR4);
+    talks.bind(GET_SENSOR5_OPCODE, GET_SENSOR5);
+    talks.bind(GET_SENSOR6_OPCODE, GET_SENSOR6);
+    talks.bind(GET_SENSOR7_OPCODE, GET_SENSOR7);
+    talks.bind(GET_SENSOR8_OPCODE, GET_SENSOR8);
+
     talks.bind(CHECK_ERROR_OPCODE, CHECK_ERROR);
 
     //bind subscription
