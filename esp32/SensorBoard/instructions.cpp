@@ -5,7 +5,6 @@
 #include <TaskManager.h>
 
 extern Mutex mutex;
-
 extern uint16_t vl53_status[VL53L0X_COUNT];
 extern uint16_t vl53_measurement[VL53L0X_COUNT];
 
@@ -69,9 +68,9 @@ void CHECK_ERROR(SerialTalks &inst, Deserializer &input, Serializer &output)
 {
     uint8_t error = 0;
 
-    for(int i; i < VL53L0X_COUNT; i++)
+    for (int i; i < VL53L0X_COUNT; i++)
     {
-        if(vl53_status[i] == 1)
+        if (vl53_status[i] == 1)
         {
             error |= (1 << i);
         }
