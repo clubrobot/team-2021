@@ -1,8 +1,8 @@
 #ifndef __CONSTANTS_H__
 #define __CONSTANTS_H__
 
-// Shift Register size
-#define SHIFT_REG_SIZE 16 //bits
+// Number of sensors
+#define VL53L0X_COUNT 8
 
 // I2C Address
 #define VL53L0X_1_I2C_ADDR 0X30

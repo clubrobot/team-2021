@@ -1,19 +1,19 @@
 #include "topics.h"
+#include "constants.h"
 
 #include <SerialTalks.h>
+#include <TaskManager.h>
 
-static uint16_t i = 0;
+extern Mutex mutex;
+extern uint16_t vl53_measurement[VL53L0X_COUNT];
 
 void GET_ALL(Serializer &output)
 {
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
-    output.write<uint16_t>(i);
+    for(int i; i < VL53L0X_COUNT; i++)
+    {
+        mutex.acquire();
+        output.write<uint16_t>(vl53_measurement[i]);
+        mutex.release();
+    }
 
-    i++;
 }

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <list>
 
 #include "instructions.h"
 #include "topics.h"
@@ -11,29 +12,38 @@
 #include <ShiftRegister.h>
 #include <VL53L0X.h>
 #include <VL6180X.h>
+#include <TaskManager.h>
 
-ShiftRegister ShutdownRegister(SHIFT_REG_SIZE);
+using namespace std;
+
+TaskManager tm;
+
+Mutex mutex;
+
+ShiftRegister ShutdownRegister(SHIFT_REGISTER_2_BYTES);
 
 VL53L0X vl53_1 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_1_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_2 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_2_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_3 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_3_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_4 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_4_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_5 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_5_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_6 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_6_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_7 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_7_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL53L0X vl53_8 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_8_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_2 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_2_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_3 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_3_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_4 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_4_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_5 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_5_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_6 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_6_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_7 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_7_SHUTDOWN_INDEX, &ShutdownRegister);
+VL53L0X vl53_8 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_8_SHUTDOWN_INDEX, &ShutdownRegister);
 
-// VL6180X vl61_1 = VL6180X(VL6180X_1_I2C_ADDR, VL6180X_1_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_2 = VL6180X(VL6180X_2_I2C_ADDR, VL6180X_2_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_3 = VL6180X(VL6180X_3_I2C_ADDR, VL6180X_3_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_4 = VL6180X(VL6180X_4_I2C_ADDR, VL6180X_4_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_5 = VL6180X(VL6180X_5_I2C_ADDR, VL6180X_5_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_6 = VL6180X(VL6180X_6_I2C_ADDR, VL6180X_6_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_7 = VL6180X(VL6180X_7_I2C_ADDR, VL6180X_7_SHUTDOWN_INDEX, &ShutdownRegister);
-// VL6180X vl61_8 = VL6180X(VL6180X_8_I2C_ADDR, VL6180X_8_SHUTDOWN_INDEX, &ShutdownRegister);
+list<VL53L0X*> sensors_vl53 = {&vl53_1, &vl53_2, &vl53_3, &vl53_4, &vl53_5, &vl53_6, &vl53_7, &vl53_8};
+
+uint8_t vl53_status[VL53L0X_COUNT] = {0, };
+uint16_t vl53_measurement[VL53L0X_COUNT] = {65535, };
+
+
+// Second loop prototype
+void loop_aux(void *aux);
 
 void setup()
 {
+    static int count = 0;
+
     // Attach shift register pin
     ShutdownRegister.attach(SHIFT_REG_LATCH, SHIFT_REG_CLOCK, SHIFT_REG_DATA);
 
@@ -52,103 +62,63 @@ void setup()
     topics.bind(GET_ALL_OPCODE, GET_ALL);
 
     // Shutdown all VL53L0X sensors
-    // vl53_1.shutdown();
-    // vl53_2.shutdown();
-    // vl53_3.shutdown();
-    // vl53_4.shutdown();
-    // vl53_5.shutdown();
-    // vl53_6.shutdown();
-    // vl53_7.shutdown();
-    // vl53_8.shutdown();
-
-    // Shutdown all VL6180X sensors
-    // vl61_1.shutdown();
-    // vl61_2.shutdown();
-    // vl61_3.shutdown();
-    // vl61_4.shutdown();
-    // vl61_5.shutdown();
-    // vl61_6.shutdown();
-    // vl61_7.shutdown();
-    // vl61_8.shutdown();
+    for (const auto& cur_sensor : sensors_vl53)
+    {
+        cur_sensor->shutdown();
+    }
 
     // Starting all VL53L0X sensors
-    // vl53_1.begin();
-    // vl53_2.begin();
-    // vl53_3.begin();
-    // vl53_4.begin();
-    // vl53_5.begin();
-    // vl53_6.begin();
-    // vl53_7.begin();
-    // vl53_8.begin();
-
-    // Starting all VL6180X sensors
-    // vl61_1.begin();
-    // vl61_2.begin();
-    // vl61_3.begin();
-    // vl61_4.begin();
-    // vl61_5.begin();
-    // vl61_6.begin();
-    // vl61_7.begin();
-    // vl61_8.begin();
+    for (const auto& cur_sensor : sensors_vl53)
+    {
+        if(!cur_sensor->begin())
+        {
+            vl53_status[count++] = 1;
+        }
+    }
+    count = 0;
 
     // Set all VL53L0X timeout in ms
-    // vl53_1.setTimeout(30);
-    // vl53_2.setTimeout(30);
-    // vl53_3.setTimeout(30);
-    // vl53_4.setTimeout(30);
-    // vl53_5.setTimeout(30);
-    // vl53_6.setTimeout(30);
-    // vl53_7.setTimeout(30);
-    // vl53_8.setTimeout(30);
-
-    // Set all VL6180X timeout in ms
-    // vl61_1.setTimeout(30);
-    // vl61_2.setTimeout(30);
-    // vl61_3.setTimeout(30);
-    // vl61_4.setTimeout(30);
-    // vl61_5.setTimeout(30);
-    // vl61_6.setTimeout(30);
-    // vl61_7.setTimeout(30);
-    // vl61_8.setTimeout(30);
-
-    // Configure all VL6180X as default
-    // vl61_1.configureDefault();
-    // vl61_2.configureDefault();
-    // vl61_3.configureDefault();
-    // vl61_4.configureDefault();
-    // vl61_5.configureDefault();
-    // vl61_6.configureDefault();
-    // vl61_7.configureDefault();
-    // vl61_8.configureDefault();
+    for (const auto& cur_sensor : sensors_vl53)
+    {
+        cur_sensor->setTimeout(30);
+    }
 
     // Starting all VL53L0X measure
-    // vl53_1.startContinuous();
-    // vl53_2.startContinuous();
-    // vl53_3.startContinuous();
-    // vl53_4.startContinuous();
-    // vl53_5.startContinuous();
-    // vl53_6.startContinuous();
-    // vl53_7.startContinuous();
-    // vl53_8.startContinuous();
+    for (const auto& cur_sensor : sensors_vl53)
+    {
+        cur_sensor->startContinuous();
+    }
 
-    // Starting all VL6180X measure
-    // vl61_1.startRangeContinuous(60);
-    // vl61_2.startRangeContinuous(60);
-    // vl61_3.startRangeContinuous(60);
-    // vl61_4.startRangeContinuous(60);
-    // vl61_5.startRangeContinuous(60);
-    // vl61_6.startRangeContinuous(60);
-    // vl61_7.startRangeContinuous(60);
-    // vl61_8.startRangeContinuous(60);
+    // Starting Second thread
+    tm.create_task(loop_aux, NULL);
+
 }
 
 // Loop
-
 void loop()
 {
     talks.execute();
     topics.execute();
 
-    // Debug
-    // Serial.println(vl53_1.readRangeContinuousMillimeters());
+    //Yield
+    vTaskDelay(pdMS_TO_TICKS(1));
+}
+
+// Second loop on core 1
+void loop_aux(void *aux)
+{
+    static int count = 0;
+    for(;;)
+    {
+        for (const auto& cur_sensor : sensors_vl53)
+        {
+            mutex.acquire();
+            vl53_measurement[count++] = cur_sensor->readRangeContinuousMillimeters();
+            mutex.release();
+        }
+        count = 0;
+    }
+
+    //Yield
+    vTaskDelay(pdMS_TO_TICKS(1));
 }
