@@ -12,8 +12,8 @@ void ShiftRegister::attach(uint8_t latchpin, uint8_t clockpin, uint8_t datapin)
     pinMode(m_DATA, OUTPUT);
 
     digitalWrite(m_LATCH, 0);
-	digitalWrite(m_CLOCK, 0);
-	digitalWrite(m_DATA, 0);
+    digitalWrite(m_CLOCK, 0);
+    digitalWrite(m_DATA, 0);
 
     m_register = 0;
 
@@ -41,25 +41,24 @@ void ShiftRegister::SetLow(int pos)
 
 void ShiftRegister::shift()
 {
-    if( m_size > 0 )
+    if (m_size > 0)
     {
         digitalWrite(m_LATCH, LOW);
-        for(int i = 0; i < m_size; i++)
+        for (int i = 0; i < m_size; i++)
         {
-            digitalWrite(m_DATA, !!(m_register & (1 << ((m_size - 1) - i))));
+            digitalWrite(m_DATA, !!(m_register & (1 << i)));
             step();
         }
         digitalWrite(m_LATCH, HIGH);
     }
-
 }
 
 void ShiftRegister::clear()
 {
-    if( m_size > 0 )
+    if (m_size > 0)
     {
         digitalWrite(m_LATCH, LOW);
-        for(int i = 0; i < m_size; i++)
+        for (int i = 0; i < m_size; i++)
         {
             digitalWrite(m_DATA, !!(m_register & (1 << ((m_size - 1) - i))));
             step();
@@ -70,7 +69,9 @@ void ShiftRegister::clear()
 
 void ShiftRegister::step()
 {
+    delayMicroseconds(45);
     digitalWrite(m_CLOCK, HIGH);
+    delayMicroseconds(45);
     digitalWrite(m_CLOCK, LOW);
 }
 
