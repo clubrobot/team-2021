@@ -14,6 +14,8 @@ geogebra, roadmap = init_roadmap(ROBOT_ID, BORNIBUS_ID)
 
 
 def init_robot():
+    """This function is called by the robot during match preparation stage
+    """
     setup_logger(INFO, "Intialize !")
 
     setup_logger(INFO, "Ready !")

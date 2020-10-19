@@ -77,15 +77,15 @@ fi # ifndef ARDUINO_DIR
 # Install ESP-32 driver for Arduino IDE
 if  [ -z "$ESP_ROOT" ] ; then
     if [ "$(uname -s)" = 'Linux' ] ; then
-        mkdir "/opt/$ARDUINO_SRC/hardware/espressif"
-        cd  "/opt/$ARDUINO_SRC/hardware/espressif"
+        mkdir "$ARDUINO_DIR/hardware/espressif"
+        cd  "$ARDUINO_DIR/hardware/espressif"
         git clone https://github.com/espressif/arduino-esp32.git esp32
         cd esp32
         git submodule update --init --recursive && \
         cd tools
         python get.py
 
-        echo export ESP_ROOT="/opt/$ARDUINO_SRC/hardware/espressif/esp32" >> "$PROFILE"
+        echo export ESP_ROOT="$ARDUINO_DIR/hardware/espressif/esp32" >> "$PROFILE"
         echo export PYTHONPATH="$REPOSITORY/raspberrypi/:\$PYTHONPATH" >> "$BASHRC"
 
     else
