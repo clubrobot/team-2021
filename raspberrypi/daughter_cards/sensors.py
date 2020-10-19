@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from common.serialutils import Deserializer
-from daughter_cards.arduino import SecureArduino, TopicHandler, SHORT, BYTE
+from daughter_cards.arduino import SecureArduino, TopicHandler, USHORT, BYTE
 import time
 
 # Instructions
@@ -23,14 +23,14 @@ GET_ALL_TOPIC_OPCODE = 0x01
 class Sensors(SecureArduino):
     TIMESTEP = 200
     MAX_DIST = 1000
-    DEFAULT = {GET_SENSOR1_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR2_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR3_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR4_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR5_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR6_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR7_OPCODE: Deserializer(SHORT(MAX_DIST)),
-               GET_SENSOR8_OPCODE: Deserializer(SHORT(MAX_DIST)), }
+    DEFAULT = {GET_SENSOR1_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR2_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR3_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR4_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR5_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR6_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR7_OPCODE: Deserializer(USHORT(MAX_DIST)),
+               GET_SENSOR8_OPCODE: Deserializer(USHORT(MAX_DIST)), }
 
     def __init__(self, parent, uuid='SensorBoard'):
         SecureArduino.__init__(self, parent, uuid, default_result=self.DEFAULT)
@@ -48,7 +48,7 @@ class Sensors(SecureArduino):
         self.sensor7 = self.MAX_DIST
         self.sensor8 = self.MAX_DIST
 
-    @TopicHandler(SHORT, SHORT, SHORT, SHORT, SHORT, SHORT, SHORT, SHORT)
+    @TopicHandler(USHORT, USHORT, USHORT, USHORT, USHORT, USHORT, USHORT, USHORT)
     def get_all_sensors_handler(self, sensor1, sensor2, sensor3, sensor4, sensor5, sensor6, sensor7, sensor8):
         self.sensor1 = sensor1
         self.sensor2 = sensor2
