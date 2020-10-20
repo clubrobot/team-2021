@@ -20,7 +20,7 @@ TaskManager tm;
 
 Mutex mutex;
 
-ShiftRegister ShutdownRegister(SHIFT_REGISTER_2_BYTES);
+ShiftRegister ShutdownRegister;
 
 VL53L0X vl53_1 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_1_SHUTDOWN_INDEX, &ShutdownRegister);
 VL53L0X vl53_2 = VL53L0X(VL53L0X_2_I2C_ADDR, VL53L0X_2_SHUTDOWN_INDEX, &ShutdownRegister);
@@ -31,14 +31,18 @@ VL53L0X vl53_6 = VL53L0X(VL53L0X_6_I2C_ADDR, VL53L0X_6_SHUTDOWN_INDEX, &Shutdown
 VL53L0X vl53_7 = VL53L0X(VL53L0X_7_I2C_ADDR, VL53L0X_7_SHUTDOWN_INDEX, &ShutdownRegister);
 VL53L0X vl53_8 = VL53L0X(VL53L0X_8_I2C_ADDR, VL53L0X_8_SHUTDOWN_INDEX, &ShutdownRegister);
 
-list<VL53L0X *> sensors_vl53 = {&vl53_1, &vl53_2, &vl53_3, &vl53_4, &vl53_5, &vl53_6, &vl53_7, &vl53_8};
+list<VL53L0X *> sensors_vl53 = {&vl53_1, &vl53_2};
 
 uint8_t vl53_status[VL53L0X_COUNT] = {0};
 
 uint16_t vl53_measurement[VL53L0X_COUNT] = {10};
 
-// Second loop prototype
-void loop_aux(void *aux);
+// serialtalks wrapper
+void talksExecuteWrapper()
+{
+    talks.execute();
+    topics.execute();
+}
 
 void setup()
 {
@@ -97,37 +101,19 @@ void setup()
     {
         cur_sensor->startContinuous();
     }
-
-    // Starting Second thread
-    tm.create_task(loop_aux, NULL);
 }
 
 // Loop
 void loop()
 {
+    static uint16_t count = 0;
+
     talks.execute();
     topics.execute();
 
-    //Yield
-    vTaskDelay(pdMS_TO_TICKS(1));
-}
-
-// Second loop on core 1
-void loop_aux(void *aux)
-{
-    static uint16_t val = 0;
-    static uint16_t count = 0;
-    for (;;)
+    for (const auto &cur_sensor : sensors_vl53)
     {
-        for (const auto &cur_sensor : sensors_vl53)
-        {
-            val = cur_sensor->readRangeContinuousMillimeters();
-            mutex.acquire();
-            vl53_measurement[count++] = val - count;
-            mutex.release();
-            vTaskDelay(pdMS_TO_TICKS(5));
-        }
-        count = 0;
-        //Yield
+        vl53_measurement[count++] = cur_sensor->readRangeContinuousMillimeters(talksExecuteWrapper);
     }
+    count = 0;
 }
