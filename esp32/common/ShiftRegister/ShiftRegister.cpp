@@ -44,7 +44,7 @@ void ShiftRegister::attach(uint8_t latchpin, uint8_t clockpin, uint8_t datapin)
 
 void ShiftRegister::SetHigh(int pos)
 {
-    if (pos <= 7 && pos >= 0)
+    if (pos < m_size && pos >= 0)
     {
         m_register |= (1 << pos);
         shift();
@@ -53,7 +53,7 @@ void ShiftRegister::SetHigh(int pos)
 
 void ShiftRegister::SetLow(int pos)
 {
-    if (pos <= 7 && pos >= 0)
+    if (pos < m_size && pos >= 0)
     {
         m_register &= ~(1 << pos);
         shift();
@@ -63,7 +63,10 @@ void ShiftRegister::SetLow(int pos)
 void ShiftRegister::shift()
 {
     digitalWrite(m_LATCH, LOW);
-    shiftOut(m_DATA, m_CLOCK, MSBFIRST, m_register);
+    for (int i = m_size; i != 0; i -= SHIFT_REGISTER_1_BYTES)
+    {
+        shiftOut(m_DATA, m_CLOCK, MSBFIRST, (m_register >> (i - SHIFT_REGISTER_1_BYTES) & 0xFF));
+    }
     digitalWrite(m_LATCH, HIGH);
 }
 

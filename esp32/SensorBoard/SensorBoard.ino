@@ -20,7 +20,7 @@ TaskManager tm;
 
 Mutex mutex;
 
-ShiftRegister ShutdownRegister;
+ShiftRegister ShutdownRegister(SHIFT_REGISTER_2_BYTES);
 
 VL53L0X vl53_1 = VL53L0X(VL53L0X_1_I2C_ADDR, VL53L0X_1_SHUTDOWN_INDEX, &ShutdownRegister);
 VL53L0X vl53_2 = VL53L0X(VL53L0X_2_I2C_ADDR, VL53L0X_2_SHUTDOWN_INDEX, &ShutdownRegister);
