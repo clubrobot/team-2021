@@ -6,7 +6,7 @@ PART_FILE=$(ESP_ROOT)/tools/partitions/default.csv
 #Arduino file
 SKETCH = color-sensors-test.ino
 
-BOARD_UUID = color-sensors
+BOARD_UUID = ColorSensors
 COMMON = ../common
 #Setup all libs used !
 LIBS =  $(ESP_LIBS)/EEPROM \

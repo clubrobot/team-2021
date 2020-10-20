@@ -23,24 +23,17 @@ void setup()
 
   // bind functions
   talks.bind(CSA_GET_RGB_OPCODE, CSA_GET_RGB);
+  talks.bind(CSA_GET_CUB_COLOR_ESTIMATE_OPCODE, CSA_GET_CUB_COLOR_ESTIMATE);
   talks.bind(CSA_SET_INTEGRATION_TIME_OPCODE, CSA_SET_INTEGRATION_TIME);
   talks.bind(CSA_SET_GAIN_OPCODE, CSA_SET_GAIN);
   talks.bind(CSA_ENABLE_OPCODE, CSA_ENABLE);
   talks.bind(CSA_DISABLE_OPCODE, CSA_DISABLE);
   talks.bind(CSA_LEDS_ON_OPCODE, CSA_LEDS_ON);
   talks.bind(CSA_LEDS_OFF_OPCODE, CSA_LEDS_OFF);
+  talks.bind(CSA_SET_CUP_COLOR_ESTIMATE_SAMPLE_SIZE_OPCODE, CSA_SET_CUP_COLOR_ESTIMATE_SAMPLE_SIZE);
 }
 
 void loop()
 {
   talks.execute();
-  /*float red, green, blue;
-
-  color_sensor_array.getRGB(1, &red, &green, &blue);
-
-  Serial.print("R: "); Serial.print(int(red));
-  Serial.print("\tG: "); Serial.print(int(green));
-  Serial.print("\tB: "); Serial.print(int(blue));
-
-  Serial.print("\n");*/
 }

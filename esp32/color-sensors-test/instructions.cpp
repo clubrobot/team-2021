@@ -5,10 +5,15 @@
 void CSA_GET_RGB(SerialTalks &inst, Deserializer &input, Serializer &output) {
   auto channel = input.read<uint8_t>();
   float red, green, blue;
-  color_sensor_array.getRGB(channel, &red, &green, &blue);
+  color_sensor_array.get_rgb(channel, &red, &green, &blue);
   output.write<float>(red);
   output.write<float>(green);
   output.write<float>(blue);
+}
+
+void CSA_GET_CUB_COLOR_ESTIMATE(SerialTalks &inst, Deserializer &input, Serializer &output) {
+  auto channel = input.read<uint8_t>();
+  output.write<uint8_t>(color_sensor_array.get_cup_color_estimate(channel));
 }
 
 void CSA_SET_INTEGRATION_TIME(SerialTalks &inst, Deserializer &input, Serializer &output) {
@@ -35,7 +40,7 @@ void CSA_SET_INTEGRATION_TIME(SerialTalks &inst, Deserializer &input, Serializer
       integration_time = TCS34725_INTEGRATIONTIME_2_4MS;
       break;
   }
-  color_sensor_array.setIntegrationTime(channel, integration_time);
+  color_sensor_array.set_integration_time(channel, integration_time);
 }
 
 void CSA_SET_GAIN(SerialTalks &inst, Deserializer &input, Serializer &output) {
@@ -56,7 +61,7 @@ void CSA_SET_GAIN(SerialTalks &inst, Deserializer &input, Serializer &output) {
       gain = TCS34725_GAIN_1X;
       break;
   }
-  color_sensor_array.setGain(channel, gain);
+  color_sensor_array.set_gain(channel, gain);
 }
 
 void CSA_ENABLE(SerialTalks &inst, Deserializer &input, Serializer &output) {
@@ -75,4 +80,9 @@ void CSA_LEDS_ON(SerialTalks &inst, Deserializer &input, Serializer &output) {
 
 void CSA_LEDS_OFF(SerialTalks &inst, Deserializer &input, Serializer &output) {
   color_sensor_array.set_leds(LOW);
+}
+
+void CSA_SET_CUP_COLOR_ESTIMATE_SAMPLE_SIZE(SerialTalks &inst, Deserializer &input, Serializer &output) {
+  auto sample_size = input.read<uint8_t>();
+  color_sensor_array.set_cup_color_estimate_sample_size(sample_size);
 }
