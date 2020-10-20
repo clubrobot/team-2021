@@ -8,11 +8,13 @@ from listeners.sensor_listener import *
 from common.roadmap import intersect
 from logs.log_manager import *
 import math
+
+
 class AviodanceBehaviour(Thread):
 
     # Avoiding behaviour
-    BEHAVIOUR_STOPPING              = 0
-    BEHAVIOUR_AVOID_ROADMAP         = 1
+    BEHAVIOUR_STOPPING = 0
+    BEHAVIOUR_AVOID_ROADMAP = 1
     BEHAVIOUR_AVOID_POTENTIAL_FIELD = 2
     # TODO : Add new behaviour here
 
@@ -20,7 +22,11 @@ class AviodanceBehaviour(Thread):
     BEHAVIOUR_DETECT_NEAR_TO_ME = 0
     BEHAVIOUR_DETECT_ON_MY_PATH = 1
 
-    def __init__(self, wheeledbase, roadmap, beacon_client, behaviour=BEHAVIOUR_STOPPING, timestep=0.1, exec_param=Logger.SHOW, log_level=INFO):
+    # Direction
+    FORWARD = 1
+    BACKWARD = -1
+
+    def __init__(self, wheeledbase, roadmap, beacon_client, sensors, behaviour=BEHAVIOUR_STOPPING, timestep=0.1, exec_param=Logger.SHOW, log_level=INFO):
         """
             Init all internals components
         """
@@ -28,18 +34,25 @@ class AviodanceBehaviour(Thread):
         self.daemon = True
 
         # Init Logger
-        self.logger = LogManager().getlogger(self.__class__.__name__, exec_param, log_level)
+        self.logger = LogManager().getlogger(
+            self.__class__.__name__, exec_param, log_level)
 
         # Create path
         self.path = None
 
-        # Init internal events
-        self.on_brother_moving_event    = Event()
-        self.on_opponentA_moving_event  = Event()
-        self.on_opponentB_moving_event  = Event()
-        # TODO Sensors event
+        # Default direction
+        self.direction = self.FORWARD
 
-        self.abort                      = Event()
+        # Init internal events
+        self.on_brother_moving_event = Event()
+        self.on_opponentA_moving_event = Event()
+        self.on_opponentB_moving_event = Event()
+
+        self.on_left_event = Event()
+        self.on_front_event = Event()
+        self.on_right_event = Event()
+
+        self.abort = Event()
 
         # Stopping event
         self.stop = Event()
@@ -49,36 +62,85 @@ class AviodanceBehaviour(Thread):
         self.on_opponentA_moving_event.clear()
         self.on_opponentB_moving_event.clear()
 
+        self.on_left_event.clear()
+        self.on_front_event.clear()
+        self.on_right_event.clear()
+
         # Bind behaviour wheeledbase and beacon client
-        self.wheeledbase        = wheeledbase
-        self.roadmap            = roadmap
-        self.beacon_client      = beacon_client
-        self.behaviour          = behaviour
-        self.timestep           = timestep # Seconds
+        self.wheeledbase = wheeledbase
+        self.roadmap = roadmap
+        self.beacon_client = beacon_client
+        self.sensors = sensors
+        self.behaviour = behaviour
+        self.timestep = timestep  # Seconds
 
         # Instanciate position listener
-        self.position_listener = PositionListener(self.beacon_client.get_brother_pos , self.beacon_client.get_opponents_pos)
+        self.position_listener = PositionListener(
+            self.beacon_client.get_brother_pos, self.beacon_client.get_opponents_pos)
 
         # Instanciate Sensors listener
-        # TODO
+        self.sensor_listener = SensorListener(
+            self._front_sensor_wrapper, self._left_sensor_wrapper, self._right_sensor_wrapper)
 
         # Bind internal event generator
-        self.position_listener.bind(PositionListener.BROTHER, self._on_brother_moving)
-        self.position_listener.bind(PositionListener.OPPONENTA, self._on_opponentA_moving)
-        self.position_listener.bind(PositionListener.OPPONENTB, self._on_opponentB_moving)
+        self.position_listener.bind(
+            PositionListener.BROTHER, self._on_brother_moving)
+        self.position_listener.bind(
+            PositionListener.OPPONENTA, self._on_opponentA_moving)
+        self.position_listener.bind(
+            PositionListener.OPPONENTB, self._on_opponentB_moving)
 
-        # TODO Sensors events
+        self.sensor_listener.bind(
+            SensorListener.LEFT, self._on_left_obstacle)
+        self.sensor_listener.bind(
+            SensorListener.FRONT, self._on_front_obstacle)
+        self.sensor_listener.bind(
+            SensorListener.RIGHT, self._on_right_obstacle)
 
         # Instanciate obstacles
-        self.friend_obstacle = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
-        self.opp_A_obstacle  = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
-        self.opp_B_obstacle  = self.roadmap.create_obstacle(( (-200,-200),(200,-200),(200,200),(-200,200) ))
+        self.friend_obstacle = self.roadmap.create_obstacle(
+            ((-200, -200), (200, -200), (200, 200), (-200, 200)))
+        self.opp_A_obstacle = self.roadmap.create_obstacle(
+            ((-200, -200), (200, -200), (200, 200), (-200, 200)))
+        self.opp_B_obstacle = self.roadmap.create_obstacle(
+            ((-200, -200), (200, -200), (200, 200), (-200, 200)))
+        # Sensor obstacle is bigger because we can't exactly know its center position
+        self.sensor_obstacle = self.roadmap.create_obstacle(
+            ((-400, -400), (400, -400), (400, 400), (-400, 400)))
 
-        self.friend_obstacle.set_position(-1000,-1000)
-        self.opp_A_obstacle.set_position(-1000,-1000)
-        self.opp_B_obstacle.set_position(-1000,-1000)
+        self.friend_obstacle.set_position(-1000, -1000)
+        self.opp_A_obstacle.set_position(-1000, -1000)
+        self.opp_B_obstacle.set_position(-1000, -1000)
+        self.sensor_obstacle.set_position(-1000, -1000)
 
         self.start()
+
+    def _left_sensor_wrapper(self):
+        """
+            Always return left sensor value depending to the robot direction
+        """
+        if self.direction == self.FORWARD:
+            return 1000, 1000
+        else:
+            return 1000, 1000
+
+    def _front_sensor_wrapper(self):
+        """
+            Always return front sensor value depending to the robot direction
+        """
+        if self.direction == self.FORWARD:
+            return 1000, 1000
+        else:
+            return 1000, 1000
+
+    def _right_sensor_wrapper(self):
+        """
+            Always return right sensor value depending to the robot direction
+        """
+        if self.direction == self.FORWARD:
+            return 1000, 1000
+        else:
+            return 1000, 1000
 
     def _on_brother_moving(self):
         """
@@ -97,6 +159,24 @@ class AviodanceBehaviour(Thread):
             Generate Event when opponentA moving
         """
         self.on_opponentB_moving_event.set()
+
+    def _on_left_obstacle(self):
+        """
+            Generate Event on left obstacle
+        """
+        self.on_left_event.set()
+
+    def _on_front_obstacle(self):
+        """
+            Generate Event on front obstacle
+        """
+        self.on_front_event.set()
+
+    def _on_right_obstacle(self):
+        """
+            Generate Event on right obstacle
+        """
+        self.on_right_event.set()
 
     def _is_on_my_path(self, obstacle):
         """
@@ -122,31 +202,64 @@ class AviodanceBehaviour(Thread):
     def run(self):
         while not self.stop.is_set():
             if self.on_brother_moving_event.is_set():
-                self.logger(INFO, "Brother is moving ...", pos=self.position_listener.get_position(PositionListener.BROTHER))
+                self.logger(INFO, "Brother is moving ...", pos=self.position_listener.get_position(
+                    PositionListener.BROTHER))
 
-                self.friend_obstacle.set_position(*self.position_listener.get_position(PositionListener.BROTHER))
+                self.friend_obstacle.set_position(
+                    *self.position_listener.get_position(PositionListener.BROTHER))
                 if(self._is_on_my_path(self.friend_obstacle)):
                     self.abort.set()
 
                 self.on_brother_moving_event.clear()
 
             if self.on_opponentA_moving_event.is_set():
-                self.logger(INFO, "OpponentA is moving ...", pos=self.position_listener.get_position(PositionListener.OPPONENTA))
+                self.logger(INFO, "OpponentA is moving ...", pos=self.position_listener.get_position(
+                    PositionListener.OPPONENTA))
 
-                self.opp_A_obstacle.set_position(*self.position_listener.get_position(PositionListener.OPPONENTA))
+                self.opp_A_obstacle.set_position(
+                    *self.position_listener.get_position(PositionListener.OPPONENTA))
                 if(self._is_on_my_path(self.opp_A_obstacle)):
                     self.abort.set()
 
                 self.on_opponentA_moving_event.clear()
 
             if self.on_opponentB_moving_event.is_set():
-                self.logger(INFO, "OpponentB is moving ...", pos=self.position_listener.get_position(PositionListener.OPPONENTB))
+                self.logger(INFO, "OpponentB is moving ...", pos=self.position_listener.get_position(
+                    PositionListener.OPPONENTB))
 
-                self.opp_B_obstacle.set_position(*self.position_listener.get_position(PositionListener.OPPONENTB))
+                self.opp_B_obstacle.set_position(
+                    *self.position_listener.get_position(PositionListener.OPPONENTB))
                 if(self._is_on_my_path(self.opp_B_obstacle)):
                     self.abort.set()
 
                 self.on_opponentB_moving_event.clear()
+
+            if self.on_left_event.is_set():
+                # Compute the obstacle position
+
+                # Get the sensor pos with the wrapper : self._left_sensor_wrapper()
+                # This function return the projected point relative to the center of the robot
+                # Get the wheeledbase position and project point on real map
+                self.logger(INFO, "Obstacle on my left ...",
+                            pos=self.wheeledbase.get_position())
+                # self.sensor_obstacle.set_position(871, 1919)
+                if(self._is_on_my_path(self.sensor_obstacle)):
+                    self.abort.set()
+                self.on_left_event.clear()
+
+            if self.on_front_event.is_set():
+                # Compute the obstacle position
+
+                if(self._is_on_my_path(self.sensor_obstacle)):
+                    self.abort.set()
+                self.on_left_event.clear()
+
+            if self.on_right_event.is_set():
+                # Compute the obstacle position
+
+                if(self._is_on_my_path(self.sensor_obstacle)):
+                    self.abort.set()
+                self.on_right_event.clear()
 
             sleep(self.timestep)
 
@@ -161,8 +274,10 @@ class AviodanceBehaviour(Thread):
         x_sp, y_sp, theta_sp = destination
 
         try:
-            self.path = self.roadmap.get_shortest_path((x_in, y_in), (x_sp, y_sp))
-            self.logger(INFO, 'follow path: [{}]'.format(', '.join('({0[0]:.0f}, {0[1]:.0f})'.format(waypoint) for waypoint in self.path)))
+            self.path = self.roadmap.get_shortest_path(
+                (x_in, y_in), (x_sp, y_sp))
+            self.logger(INFO, 'follow path: [{}]'.format(', '.join(
+                '({0[0]:.0f}, {0[1]:.0f})'.format(waypoint) for waypoint in self.path)))
         except RuntimeError:
             path_not_found = True
 
@@ -174,12 +289,14 @@ class AviodanceBehaviour(Thread):
 
         # Pure Pursuit configuration
         if math.cos(math.atan2(self.path[1][1] - self.path[0][1], self.path[1][0] - self.path[0][0]) - theta_in) >= 0:
-            direction = 1
+            self.logger(INFO, 'Moving forward !')
+            self.direction = self.FORWARD
         else:
-            direction = -1
+            self.logger(INFO, 'Moving backward !')
+            self.direction = self.BACKWARD
 
         if math.hypot(self.path[1][0] - self.path[0][0], self.path[1][1] - self.path[0][1]) < 5 and theta_sp is not None:
-            finalangle = theta_sp - (direction - 1) * math.pi
+            finalangle = theta_sp - (self.direction - 1) * math.pi
         else:
             finalangle = None
 
@@ -187,11 +304,14 @@ class AviodanceBehaviour(Thread):
         self.wheeledbase.lookaheadbis.set(150)
         self.wheeledbase.max_linvel.set(500)
         self.wheeledbase.max_angvel.set(6.0)
-        self.wheeledbase.linpos_threshold.set(linpos_threshold or default_linpos_threshold)
-        self.wheeledbase.angpos_threshold.set(angpos_threshold or default_angpos_threshold)
+        self.wheeledbase.linpos_threshold.set(
+            linpos_threshold or default_linpos_threshold)
+        self.wheeledbase.angpos_threshold.set(
+            angpos_threshold or default_angpos_threshold)
 
         # Trajectory
-        self.wheeledbase.purepursuit(self.path, direction={1:'forward', -1:'backward'}[direction], finalangle=finalangle)
+        self.wheeledbase.purepursuit(self.path, direction={
+                                     self.FORWARD: 'forward', self.BACKWARD: 'backward'}[self.direction], finalangle=finalangle)
 
         # Wait until destination is reached
         isarrived = False
@@ -212,10 +332,11 @@ class AviodanceBehaviour(Thread):
 
             if blocked:
                 self.logger(INFO, 'Go backward a little')
-                self.wheeledbase.set_velocities(-direction * 100, 0)
+                self.wheeledbase.set_velocities(-self.direction * 100, 0)
                 sleep(1)
                 self.logger(INFO, 'Resume path')
-                self.wheeledbase.purepursuit(self.path, direction={1:'forward', -1:'backward'}[direction])
+                self.wheeledbase.purepursuit(
+                    self.path, direction={self.FORWARD: 'forward', self.BACKWARD: 'backward'}[self.direction])
                 blocked = False
 
         # Everything is fine
@@ -223,16 +344,3 @@ class AviodanceBehaviour(Thread):
         self.wheeledbase.angpos_threshold.set(default_angpos_threshold)
 
         return True
-
-if __name__ == "__main__":
-    from beacons.global_sync import ClientGS
-
-    LogManager().start()
-    try:
-        beacon = ClientGS(1, ip ='127.0.0.1')
-        beacon.connect()
-        beacon.reset_ressources()
-
-        a = AviodanceBehaviour(None, beacon)
-    except TimeoutError:
-        pass

@@ -1,71 +1,105 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import time
-import math
-from common.serialutils import Deserializer
-from common.serialtalks import BYTE, INT, LONG, FLOAT
-from daughter_cards.arduino import SecureArduino
-from setups.setup_robot_name import *
-# Instructions
 
-_GET_MESURE_SENSOR_OPCODE = 0x10
-_ACTIVATE_SENSORS_OPCODE = 0x11
-_DESACTIVATE_SENSORS_OPCODE = 0x12
-_GET_NORMAL_OPCODE = 0x13
-_GET_LEFT_SWITCH_OPCODE = 0x14
-_GET_RIGHT_SWITCH_OPCODE = 0x15
+from common.serialutils import Deserializer
+from daughter_cards.arduino import SecureArduino, TopicHandler, SHORT, BYTE
+import time
+
+# Instructions
+GET_SENSOR1_OPCODE = 0x10
+GET_SENSOR2_OPCODE = 0x11
+GET_SENSOR3_OPCODE = 0x12
+GET_SENSOR4_OPCODE = 0x13
+GET_SENSOR5_OPCODE = 0x14
+GET_SENSOR6_OPCODE = 0x15
+GET_SENSOR7_OPCODE = 0x16
+GET_SENSOR8_OPCODE = 0x17
+
+CHECK_ERROR_OPCODE = 0X18
+
+GET_ALL_TOPIC_OPCODE = 0x01
 
 
 class Sensors(SecureArduino):
-    # Default execute result
-    _DEFAULT = {_GET_LEFT_SWITCH_OPCODE: Deserializer(BYTE(0)),
-                _GET_RIGHT_SWITCH_OPCODE: Deserializer(BYTE(0)),
-                _GET_NORMAL_OPCODE: Deserializer(FLOAT(1000) + FLOAT(0) + FLOAT(1000) + FLOAT(0)),
-                _GET_MESURE_SENSOR_OPCODE: Deserializer(INT(1000) + INT(1000))}
+    TIMESTEP = 200
+    MAX_DIST = 1000
+    DEFAULT = {GET_SENSOR1_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR2_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR3_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR4_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR5_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR6_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR7_OPCODE: Deserializer(SHORT(MAX_DIST)),
+               GET_SENSOR8_OPCODE: Deserializer(SHORT(MAX_DIST)), }
 
-    def __init__(self, parent, uuid='sensors'):
-        SecureArduino.__init__(self, parent, uuid, Sensors._DEFAULT)
+    def __init__(self, parent, uuid='SensorBoard'):
+        SecureArduino.__init__(self, parent, uuid, default_result=self.DEFAULT)
+        self.last_time = None
 
-    def get_normal(self, delta_time):
-        output = self.execute(_GET_NORMAL_OPCODE, INT(delta_time))
-        av_std, av_var, ar_std, ar_var = output.read(
-            FLOAT, FLOAT, FLOAT, FLOAT)
-        return ((av_std, av_var), (ar_std, ar_var))
+        self.addTopic(GET_ALL_TOPIC_OPCODE,
+                      self.get_all_sensors_handler, "sensors", self.TIMESTEP)
 
-    def get_mesure(self, **kwargs):
-        if ROBOT_ID == R128_ID:
-            return (1000, 1000)
-        output = self.execute(_GET_MESURE_SENSOR_OPCODE, **kwargs)
-        ar, av = output.read(INT, INT)
-        if ar == 0 and av == 0:
-            return (1000, 1000)
-        if self._compid == "sensorsAr":
-            return ar, av
-        return ar, av
+        self.sensor1 = self.MAX_DIST
+        self.sensor2 = self.MAX_DIST
+        self.sensor3 = self.MAX_DIST
+        self.sensor4 = self.MAX_DIST
+        self.sensor5 = self.MAX_DIST
+        self.sensor6 = self.MAX_DIST
+        self.sensor7 = self.MAX_DIST
+        self.sensor8 = self.MAX_DIST
 
-    def wait(self, threshold, timeout=2):
-        init_time = time.time()
-        left, right = self.get_mesure()
+    @TopicHandler(SHORT, SHORT, SHORT, SHORT, SHORT, SHORT, SHORT, SHORT)
+    def get_all_sensors_handler(self, sensor1, sensor2, sensor3, sensor4, sensor5, sensor6, sensor7, sensor8):
+        self.sensor1 = sensor1
+        self.sensor2 = sensor2
+        self.sensor3 = sensor3
+        self.sensor4 = sensor4
+        self.sensor5 = sensor5
+        self.sensor6 = sensor6
+        self.sensor7 = sensor7
+        self.sensor8 = sensor8
 
-        while (left < threshold or right < threshold) \
-                and time.time()-init_time < timeout:
-            time.sleep(0.2)
-            left, right = self.get_mesure()
-            print(left, right)
+    def get_all(self):
+        return [self.sensor1, self.sensor2, self.sensor3, self.sensor4, self.sensor5, self.sensor6, self.sensor7, self.sensor8]
 
-        if not (left > threshold and right > threshold):
-            raise TimeoutError()
+    def get_range1(self):
+        return self.sensor1
 
-    def activate(self):
-        self.send(_ACTIVATE_SENSORS_OPCODE)
+    def get_range2(self):
+        return self.sensor2
 
-    def desactivate(self):
-        self.send(_DESACTIVATE_SENSORS_OPCODE)
+    def get_range3(self):
+        return self.sensor3
 
-    def get_left_switch(self):
-        output = self.execute(_GET_LEFT_SWITCH_OPCODE)
-        return bool(output.read(BYTE))
+    def get_range4(self):
+        return self.sensor4
 
-    def get_right_switch(self):
-        output = self.execute(_GET_RIGHT_SWITCH_OPCODE)
-        return bool(output.read(BYTE))
+    def get_range5(self):
+        return self.sensor5
+
+    def get_range6(self):
+        return self.sensor6
+
+    def get_range7(self):
+        return self.sensor7
+
+    def get_range8(self):
+        return self.sensor8
+
+    def is_ready(self):
+        try:
+            return self.is_connected
+        except:
+            return False
+
+    def check_errors(self):
+        deser = self.execute(CHECK_ERROR_OPCODE)
+        error = deser.read(BYTE)
+        return error
+
+
+if __name__ == "__main__":
+    from setups.setup_serialtalks import *
+
+    s = Sensors(manager, '/dev/tty.SLAB_USBtoUART')
+    s.subscribeSensors()
