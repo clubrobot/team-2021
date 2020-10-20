@@ -515,7 +515,7 @@ void VL53L0X::stopContinuous()
     writeReg(0xFF, 0x00);
 }
 
-uint16_t VL53L0X::readRangeContinuousMillimeters()
+uint16_t VL53L0X::readRangeContinuousMillimeters(void (*functionPointer)())
 {
     while ((readReg(VL53L0X_RESULT_INTERRUPT_STATUS) & 0x07) == 0)
     {
@@ -523,6 +523,10 @@ uint16_t VL53L0X::readRangeContinuousMillimeters()
         {
             _did_timeout = true;
             return _previousRange;
+        }
+        if (functionPointer != NULL)
+        {
+            functionPointer();
         }
     }
     /*  assumptions: Linearity Corrective Gain is 1000 (default);

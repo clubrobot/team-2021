@@ -33,7 +33,7 @@ public:
 
     void startContinuous(uint32_t period_ms = 0);
     void stopContinuous();
-    uint16_t readRangeContinuousMillimeters();
+    uint16_t readRangeContinuousMillimeters(void (*functionPointer)());
 
     inline void setTimeout(uint16_t timeout) { _io_timeout = timeout; }
     inline uint16_t getTimeout() { return _io_timeout; }
