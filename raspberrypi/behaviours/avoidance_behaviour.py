@@ -239,7 +239,7 @@ class AviodanceBehaviour(Thread):
                     sleep(1)
 
                 if self.abort.is_set():
-                    self.abort.clear
+                    self.abort.clear()
                     self.logger(INFO, "No Obstacle !",)
 
             else:
