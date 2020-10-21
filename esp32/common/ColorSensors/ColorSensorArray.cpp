@@ -8,6 +8,7 @@ ColorSensorArray::ColorSensorArray() :
   cup_color_estimate_sample_size_(10) {}
 
 bool ColorSensorArray::set_channel(uint8_t channel) {
+  // TODO: return actual value when mux hardware will be ready for testing.
   /*return*/ this->mux_->set_selected_channels(1 << (channel % 8)) == I2C_ERROR_OK;
   return true;
 }
@@ -24,6 +25,10 @@ bool ColorSensorArray::begin(uint8_t channel) {
     return false;
   }
   return this->sensor_interface_.begin(TCS34725_ADDRESS, this->mux_->get_wire());
+}
+
+void ColorSensorArray::reset() {
+  this->mux_->reset();
 }
 
 bool ColorSensorArray::get_rgb(uint8_t channel, float *r, float *g, float *b) {

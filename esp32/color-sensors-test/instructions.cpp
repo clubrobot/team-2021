@@ -2,6 +2,11 @@
 
 #include <SerialTalks.h>
 
+void CSA_GET_CUP_COLOR_ESTIMATE(SerialTalks &inst, Deserializer &input, Serializer &output) {
+  auto channel = input.read<uint8_t>();
+  output.write<uint8_t>(color_sensor_array.get_cup_color_estimate(channel));
+}
+
 void CSA_GET_RGB(SerialTalks &inst, Deserializer &input, Serializer &output) {
   auto channel = input.read<uint8_t>();
   float red, green, blue;
@@ -9,11 +14,6 @@ void CSA_GET_RGB(SerialTalks &inst, Deserializer &input, Serializer &output) {
   output.write<float>(red);
   output.write<float>(green);
   output.write<float>(blue);
-}
-
-void CSA_GET_CUB_COLOR_ESTIMATE(SerialTalks &inst, Deserializer &input, Serializer &output) {
-  auto channel = input.read<uint8_t>();
-  output.write<uint8_t>(color_sensor_array.get_cup_color_estimate(channel));
 }
 
 void CSA_SET_INTEGRATION_TIME(SerialTalks &inst, Deserializer &input, Serializer &output) {
@@ -85,4 +85,8 @@ void CSA_LEDS_OFF(SerialTalks &inst, Deserializer &input, Serializer &output) {
 void CSA_SET_CUP_COLOR_ESTIMATE_SAMPLE_SIZE(SerialTalks &inst, Deserializer &input, Serializer &output) {
   auto sample_size = input.read<uint8_t>();
   color_sensor_array.set_cup_color_estimate_sample_size(sample_size);
+}
+
+void CSA_RESET(SerialTalks &inst, Deserializer &input, Serializer &output) {
+  color_sensor_array.reset();
 }

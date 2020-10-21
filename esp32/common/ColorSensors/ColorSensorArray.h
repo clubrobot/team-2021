@@ -24,6 +24,7 @@ class ColorSensorArray {
 
   void begin(TCA9548A *mux, uint8_t leds_pin);
   bool begin(uint8_t channel);
+  void reset();
 
   bool get_rgb(uint8_t channel, float *r, float *g, float *b);
   bool set_integration_time(uint8_t channel, tcs34725IntegrationTime_t it);

@@ -14,16 +14,17 @@ void setup()
   Serial.begin(SERIALTALKS_BAUDRATE);
   talks.begin(Serial);
 
-  // Fake reset pin. Should return false.
-  color_sensor_array_mux.begin(34);
+  if (!color_sensor_array_mux.begin(34)) {
+    // !ERROR.
+  }
   color_sensor_array.begin(&color_sensor_array_mux, 23);
-  if (!color_sensor_array.begin(1)) {
-    // ERROR.
+  if (!color_sensor_array.begin(0)) {
+    // !ERROR.
   }
 
   // bind functions
+  talks.bind(CSA_GET_CUP_COLOR_ESTIMATE_OPCODE, CSA_GET_CUP_COLOR_ESTIMATE);
   talks.bind(CSA_GET_RGB_OPCODE, CSA_GET_RGB);
-  talks.bind(CSA_GET_CUB_COLOR_ESTIMATE_OPCODE, CSA_GET_CUB_COLOR_ESTIMATE);
   talks.bind(CSA_SET_INTEGRATION_TIME_OPCODE, CSA_SET_INTEGRATION_TIME);
   talks.bind(CSA_SET_GAIN_OPCODE, CSA_SET_GAIN);
   talks.bind(CSA_ENABLE_OPCODE, CSA_ENABLE);
@@ -31,6 +32,7 @@ void setup()
   talks.bind(CSA_LEDS_ON_OPCODE, CSA_LEDS_ON);
   talks.bind(CSA_LEDS_OFF_OPCODE, CSA_LEDS_OFF);
   talks.bind(CSA_SET_CUP_COLOR_ESTIMATE_SAMPLE_SIZE_OPCODE, CSA_SET_CUP_COLOR_ESTIMATE_SAMPLE_SIZE);
+  talks.bind(CSA_RESET_OPCODE, CSA_RESET);
 }
 
 void loop()
