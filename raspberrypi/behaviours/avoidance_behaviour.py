@@ -80,7 +80,8 @@ class AviodanceBehaviour(Thread):
         try:
             self.sensors.subscribeSensors()
         except:
-            self.logger(CRITICAL, 'Cannot subsribe to the topic handler, no opponent detection')
+            self.logger(
+                CRITICAL, 'Cannot subsribe to the topic handler, no opponent detection')
 
         # Instanciate position listener
         self.position_listener = PositionListener(
@@ -139,18 +140,18 @@ class AviodanceBehaviour(Thread):
             Always return mid left sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return self.sensors.get_range_mid_left_front()
+            return self.sensors.get_sensor1_range()
         else:
-            return self.sensors.get_range_mid_left_back()
+            return self.sensors.get_sensor3_range()
 
     def _mid_right_sensor_wrapper(self):
         """
             Always return mid right sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return self.sensors.get_range_mid_right_front()
+            return self.sensors.get_sensor2_range()
         else:
-            return self.sensors.get_range_mid_right_back()
+            return self.sensors.get_sensor4_range()
 
     def _right_sensor_wrapper(self):
         """
@@ -228,18 +229,18 @@ class AviodanceBehaviour(Thread):
         while not self.stop.is_set():
 
             if self.behaviour == self.BEHAVIOUR_STOPPING:
-                    while self.on_left_event.is_set() or self.on_mid_left_event.is_set() or self.on_mid_right_event.is_set() or self.on_right_event.is_set():
-                        self.logger(WARNING, "Obstacle on my path !",)
-                        self.abort.set()
-                        self.on_left_event.clear()
-                        self.on_mid_left_event.clear()
-                        self.on_mid_right_event.clear()
-                        self.on_right_event.clear()
-                        sleep(1)
+                while self.on_left_event.is_set() or self.on_mid_left_event.is_set() or self.on_mid_right_event.is_set() or self.on_right_event.is_set():
+                    self.logger(WARNING, "Obstacle on my path !",)
+                    self.abort.set()
+                    self.on_left_event.clear()
+                    self.on_mid_left_event.clear()
+                    self.on_mid_right_event.clear()
+                    self.on_right_event.clear()
+                    sleep(1)
 
-                    if self.abort.is_set():
-                        self.abort.clear
-                        self.logger(INFO, "No Obstacle !",)
+                if self.abort.is_set():
+                    self.abort.clear
+                    self.logger(INFO, "No Obstacle !",)
 
             else:
                 if self.on_brother_moving_event.is_set():
@@ -281,7 +282,8 @@ class AviodanceBehaviour(Thread):
                     # Get the sensor pos with the wrapper : self._left_sensor_wrapper()
                     # This function return the projected point relative to the center of the robot
                     # Get the wheeledbase position and project point on real map
-                    self.logger(WARNING, "Obstacle on my left ...", dist=self._left_sensor_wrapper())
+                    self.logger(WARNING, "Obstacle on my left ...",
+                                dist=self._left_sensor_wrapper())
                     # self.sensor_obstacle.set_position(871, 1919)
                     if(self._is_on_my_path(self.sensor_obstacle)):
                         self.abort.set()
@@ -289,21 +291,24 @@ class AviodanceBehaviour(Thread):
 
                 if self.on_mid_left_event.is_set():
                     # Compute the obstacle position
-                    self.logger(WARNING, "Obstacle on my mid left ...", dist=self._mid_left_sensor_wrapper())
+                    self.logger(WARNING, "Obstacle on my mid left ...",
+                                dist=self._mid_left_sensor_wrapper())
                     if(self._is_on_my_path(self.sensor_obstacle)):
                         self.abort.set()
                     self.on_mid_left_event.clear()
 
                 if self.on_mid_right_event.is_set():
                     # Compute the obstacle position
-                    self.logger(WARNING, "Obstacle on my mid right ...", dist=self._mid_right_sensor_wrapper())
+                    self.logger(WARNING, "Obstacle on my mid right ...",
+                                dist=self._mid_right_sensor_wrapper())
                     if(self._is_on_my_path(self.sensor_obstacle)):
                         self.abort.set()
                     self.on_mid_right_event.clear()
 
                 if self.on_right_event.is_set():
                     # Compute the obstacle position
-                    self.logger(WARNING, "Obstacle on my right ...", dist=self._right_sensor_wrapper())
+                    self.logger(WARNING, "Obstacle on my right ...",
+                                dist=self._right_sensor_wrapper())
                     if(self._is_on_my_path(self.sensor_obstacle)):
                         self.abort.set()
                     self.on_right_event.clear()
@@ -384,7 +389,7 @@ class AviodanceBehaviour(Thread):
                         sleep(1)
                     self.logger(INFO, 'Continue ...')
                     return False
-            else :
+            else:
                 if self.abort.is_set():
                     self.wheeledbase.stop()
                     self.abort.clear()
