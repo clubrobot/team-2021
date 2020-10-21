@@ -31,7 +31,7 @@ VL53L0X vl53_6 = VL53L0X(VL53L0X_6_I2C_ADDR, VL53L0X_6_SHUTDOWN_INDEX, &Shutdown
 VL53L0X vl53_7 = VL53L0X(VL53L0X_7_I2C_ADDR, VL53L0X_7_SHUTDOWN_INDEX, &ShutdownRegister);
 VL53L0X vl53_8 = VL53L0X(VL53L0X_8_I2C_ADDR, VL53L0X_8_SHUTDOWN_INDEX, &ShutdownRegister);
 
-list<VL53L0X *> sensors_vl53 = {&vl53_1, &vl53_2};
+list<VL53L0X *> sensors_vl53 = {&vl53_1, &vl53_2, &vl53_3, &vl53_4};
 
 uint8_t vl53_status[VL53L0X_COUNT] = {0};
 
