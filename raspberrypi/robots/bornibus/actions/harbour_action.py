@@ -5,6 +5,7 @@ from math import pi
 import random
 
 from behaviours.action.action import *
+from behaviours.robot_behaviour import RobotBehavior
 from logs.log_manager import *
 
 
@@ -18,13 +19,22 @@ class Harbour(Action):
 
         self.destination = random.randint(self.NORTH, self.SOUTH)
 
-        if self.destination == self.NORTH:
-            self.actionpoint = geo.get('North'+str(self.color))
+        if color == RobotBehavior.YELLOW_SIDE:
+            north = 'NorthYellow'
+            south = 'SouthYellow'
             self.orientation = pi
+        else:
+            north = 'NorthBlue'
+            south = 'SouthBlue'
+            self.orientation = -pi
+
+        if self.destination == self.NORTH:
+            self.actionpoint = geo.get(north)
+
             self.actionpoint_precision = 10
         else:
-            self.actionpoint = geo.get('South'+str(self.color))
-            self.orientation = pi
+            self.actionpoint = geo.get(south)
+
             self.actionpoint_precision = 10
 
         self.logger(INFO, 'Final Harbour is : ', {
