@@ -23,8 +23,8 @@ GET_ALL_TOPIC_OPCODE = 0x01
 
 
 class Sensors(SecureArduino):
-    TIMESTEP = 200
-    MAX_DIST = 5000
+    TIMESTEP = 100
+    MAX_DIST = 10000
     DEFAULT = {GET_SENSOR1_OPCODE: Deserializer(USHORT(MAX_DIST)),
                GET_SENSOR2_OPCODE: Deserializer(USHORT(MAX_DIST)),
                GET_SENSOR3_OPCODE: Deserializer(USHORT(MAX_DIST)),
