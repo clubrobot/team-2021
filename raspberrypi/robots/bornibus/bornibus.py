@@ -4,10 +4,11 @@
 from robots.bornibus.setup_bornibus import *
 from behaviours.robot_behaviour import RobotBehavior
 from behaviours.avoidance_behaviour import AviodanceBehaviour
-from robots.bornibus.actions.take_cup_action import TakeCup
+from robots.bornibus.actions.wind_action import WindAction
+from robots.bornibus.actions.push_cup_action import PushCupAction
 from robots.bornibus.actions.harbour_action import Harbour
 from math import pi
-COLOR = RobotBehavior.YELLO_SIDE
+COLOR = RobotBehavior.YELLOW_SIDE
 PREPARATION = False
 
 
@@ -17,6 +18,7 @@ class Bornibus(RobotBehavior):
     Args:
         RobotBehavior (class): The main bornibus class inherit from the global robot behaviour in order to have a common behaviour for each robot you want
     """
+
     def __init__(self, manager, *args, timelimit=None, **kwargs):
         """The initialisation function create all functional module of the robot. This function also instanciate all the match actions
 
@@ -30,24 +32,11 @@ class Bornibus(RobotBehavior):
         self.avoidance_behaviour = AviodanceBehaviour(
             wheeledbase, roadmap, robot_beacon, sensors)
 
+        self.side = RobotBehavior.BLUE_SIDE
+
         self.wheeledbase = wheeledbase
 
-        take1 = TakeCup(geogebra, 1)
-        take2 = TakeCup(geogebra, 2)
-        take3 = TakeCup(geogebra, 3)
-        take4 = TakeCup(geogebra, 4)
-        take5 = TakeCup(geogebra, 5)
-
-        self.harbour = Harbour(geogebra, "Yellow")
-
-        self.automate = [
-            take5,
-            take1,
-            take2,
-            take3,
-            take4,
-            self.harbour
-        ]
+        self.automate = []
 
         self.automatestep = 0
 
@@ -89,12 +78,31 @@ class Bornibus(RobotBehavior):
         Args:
             side (int): Yellow or blue
         """
-        pass
+        self.side = side
+
+        self.wind = WindAction(geogebra, self.side)
+        self.push1 = PushCupAction(geogebra, self.side, 1)
+        self.push2 = PushCupAction(geogebra, self.side, 2)
+        self.push3 = PushCupAction(geogebra, self.side, 3)
+        self.push4 = PushCupAction(geogebra, self.side, 4)
+        self.harbour = Harbour(geogebra, self.side)
+
+        self.automate = [
+            self.wind,
+            self.push1,
+            self.push2,
+            self.push3,
+            self.push4,
+            self.harbour
+        ]
 
     def set_position(self):
         """This function apply the starting position of the robot reagading to the choosed side
         """
-        wheeledbase.set_position(*geogebra.get('StartYellow'), -pi/2)
+        if self.side == RobotBehavior.YELLOW_SIDE:
+            wheeledbase.set_position(*geogebra.get('StartYellow'), -pi/2)
+        else:
+            wheeledbase.set_position(*geogebra.get('StartBlue'), pi/2)
 
     def positioning(self):
         """This optionnal function can be useful to do a small move after setting up the postion during the preparation phase
