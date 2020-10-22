@@ -52,7 +52,7 @@ class PushCupAction(Action):
                 x_sp, y_sp, theta_sp = x_in + 250, y_in, theta_in
 
         # # Deploy arm
-        sleep(1)
+        # sleep(1)
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
@@ -61,4 +61,4 @@ class PushCupAction(Action):
         robot.wheeledbase.wait()
 
         # UnDeploy arm
-        sleep(3)
+        # sleep(1)

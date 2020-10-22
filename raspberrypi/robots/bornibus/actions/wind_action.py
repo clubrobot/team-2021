@@ -39,9 +39,9 @@ class WindAction(Action):
             x_sp, y_sp, theta_sp = x_in, y_in + 500, theta_in
 
         # Deploy arm
-        sleep(1)
+        # sleep(1)
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
 
         # UnDeploy arm
-        sleep(1)
+        # sleep(1)
