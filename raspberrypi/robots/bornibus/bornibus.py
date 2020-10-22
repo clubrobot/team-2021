@@ -32,24 +32,10 @@ class Bornibus(RobotBehavior):
         self.avoidance_behaviour = AviodanceBehaviour(
             wheeledbase, roadmap, robot_beacon, sensors)
 
+        self.side = RobotBehavior.BLUE_SIDE
 
-<< << << < HEAD
         self.wheeledbase = wheeledbase
         self.display = display
-
-        # Default side
-        self.side = self.YELLO_SIDE
-
-        take1 = TakeCup(geogebra, 1)
-        take2 = TakeCup(geogebra, 2)
-        take3 = TakeCup(geogebra, 3)
-        take4 = TakeCup(geogebra, 4)
-        take5 = TakeCup(geogebra, 5)
-== == == =
-        self.side = RobotBehavior.BLUE_SIDE
->>>>>> > master
-
-        self.wheeledbase = wheeledbase
 
         self.automate = []
 
@@ -91,9 +77,6 @@ class Bornibus(RobotBehavior):
             return False
 
     def set_side(self, side):
-        self.side = side
-
-    def set_position(self):
         """This function is called during the preparation phase in order to choose the starting side
 
         Args:
