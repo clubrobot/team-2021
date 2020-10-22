@@ -84,12 +84,12 @@ class AviodanceBehaviour(Thread):
         self.timestep = timestep  # Seconds
 
         # subscribe to the sensors topic
-        try:
-            ret = self.sensors.subscribeSensors()
-            self.logger(INFO, 'Subscribe to the sensors topics', status=ret)
-        except:
-            self.logger(
-                CRITICAL, 'Cannot subsribe to the topic handler, no opponent detection')
+        # try:
+        #     ret = self.sensors.subscribeSensors()
+        #     self.logger(INFO, 'Subscribe to the sensors topics', status=ret)
+        # except:
+        #     self.logger(
+        #         CRITICAL, 'Cannot subsribe to the topic handler, no opponent detection')
 
         # Instanciate position listener
         self.position_listener = PositionListener(
@@ -97,7 +97,7 @@ class AviodanceBehaviour(Thread):
 
         # Instanciate Sensors listener
         self.sensor_listener = SensorListener(
-            self._left_sensor_wrapper, self._mid_left_sensor_wrapper, self._mid_right_sensor_wrapper, self._right_sensor_wrapper)
+            self._left_sensor_wrapper, self._mid_left_sensor_wrapper, self._mid_right_sensor_wrapper, self._right_sensor_wrapper, threshold=300)
 
         # Bind internal event generator
         self.position_listener.bind(
@@ -148,18 +148,18 @@ class AviodanceBehaviour(Thread):
             Always return mid left sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return self.sensors.get_sensor1_range()
-        else:
             return self.sensors.get_sensor3_range()
+        else:
+            return self.sensors.get_sensor1_range()
 
     def _mid_right_sensor_wrapper(self):
         """
             Always return mid right sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return self.sensors.get_sensor2_range()
-        else:
             return self.sensors.get_sensor4_range()
+        else:
+            return self.sensors.get_sensor2_range()
 
     def _right_sensor_wrapper(self):
         """
@@ -236,11 +236,11 @@ class AviodanceBehaviour(Thread):
     def run(self):
         while not self.stop.is_set():
             # Check opponents only on running state
-            if self.start == self.RUN:
+            if self.state == self.RUN:
                 # when the beahaviour is stopping, only stop the robot and wait
                 if self.behaviour == self.BEHAVIOUR_STOPPING:
                     while self.on_left_event.is_set() or self.on_mid_left_event.is_set() or self.on_mid_right_event.is_set() or self.on_right_event.is_set():
-                        self.logger(WARNING, "Obstacle on my path !",)
+                        self.logger(WARNING, "Obstacle on my path !")
                         self.abort.set()
                         self.on_left_event.clear()
                         self.on_mid_left_event.clear()
@@ -367,7 +367,7 @@ class AviodanceBehaviour(Thread):
 
         self.wheeledbase.lookahead.set(150)
         self.wheeledbase.lookaheadbis.set(150)
-        self.wheeledbase.max_linvel.set(500)
+        self.wheeledbase.max_linvel.set(200)
         self.wheeledbase.max_angvel.set(6.0)
         self.wheeledbase.linpos_threshold.set(
             linpos_threshold or default_linpos_threshold)
