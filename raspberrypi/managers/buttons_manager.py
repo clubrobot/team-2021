@@ -4,6 +4,7 @@ from common.components import LightButtonProxy, SwitchProxy
 from threading import Semaphore
 from logs.log_manager import *
 
+
 class ButtonsManager:
     RED_PIN = 18  # 1
     RED_LIGHT = 23
@@ -33,7 +34,7 @@ class ButtonsManager:
 
     def set_team_yellow(self):
         self.logger(INFO, "Yellow Team")
-        self.side = RobotBehavior.YELLO_SIDE
+        self.side = RobotBehavior.YELLOW_SIDE
         ssd.set_message("team : y")
         self.green.set_function(
             Thread(target=self.odometry_stage, daemon=True).start)
