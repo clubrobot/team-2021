@@ -13,6 +13,7 @@ class ShiftRegister
 public:
     ShiftRegister() : m_size(SHIFT_REGISTER_1_BYTES) {}
     ShiftRegister(int size) : m_size(size) {}
+
     void attach(uint8_t latchpin, uint8_t clockpin, uint8_t datapin);
     void SetHigh(int pos);
     void SetLow(int pos);
@@ -21,17 +22,13 @@ public:
     //protected:
     void shift();
 
-    void clear();
-    void step();
+    int m_size;
 
     uint8_t m_LATCH;
     uint8_t m_CLOCK;
     uint8_t m_DATA;
 
-    int m_size;
-
     volatile uint32_t m_register;
 };
-
 //extern ShiftRegister shift;
 #endif // __SHIFTREGISTER_H__

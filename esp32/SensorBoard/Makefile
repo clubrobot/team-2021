@@ -18,7 +18,8 @@ LIBS =  $(ESP_LIBS)/EEPROM \
 		$(COMMON)/SerialTopics \
 		$(COMMON)/ShiftRegister \
 		$(COMMON)/VL6180X \
-		$(COMMON)/VL53L0X
+		$(COMMON)/VL53L0X \
+		$(COMMON)/TaskManager
 # Define
 CPPFLAGS += -DSERIALTALKS_MAX_OPCODE=0x30
 

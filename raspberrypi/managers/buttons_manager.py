@@ -27,21 +27,21 @@ class ButtonsManager:
         self.logger(INFO, "Team Stage")
         ssd.set_message("set team")
         self.blue.set_function(
-            Thread(target=self.set_team_purple, daemon=True).start)
+            Thread(target=self.set_team_blue, daemon=True).start)
         self.orange.set_function(
             Thread(target=self.set_team_yellow, daemon=True).start)
 
     def set_team_yellow(self):
         self.logger(INFO, "Yellow Team")
         self.side = RobotBehavior.YELLO_SIDE
-        ssd.set_message("team : o")
+        ssd.set_message("team : y")
         self.green.set_function(
             Thread(target=self.odometry_stage, daemon=True).start)
 
-    def set_team_purple(self):
-        self.logger(INFO, "Purple Team")
+    def set_team_blue(self):
+        self.logger(INFO, "Blue Team")
         self.side = RobotBehavior.BLUE_SIDE
-        ssd.set_message("team : m")
+        ssd.set_message("team : b")
         self.green.set_function(
             Thread(target=self.odometry_stage, daemon=True).start)
 
@@ -97,7 +97,7 @@ class ButtonsManager:
         self.orange.close()
         self.green.close()
 
-        Thread(target=self.auto.run(), daemon=True).start()
+        Thread(target=self.auto.start(), daemon=True).start()
         self.p.release()
 
     def __init__(self, auto):

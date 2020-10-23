@@ -32,13 +32,13 @@ VL53L0X::VL53L0X(uint8_t i2c_addr, uint8_t shutdown_pin, ShiftRegister *shift_re
 void VL53L0X::shutdown()
 {
     /* always shutdown the sensor at the beggining */
-    if (_shutdown_pin != NULL)
+    if (_shift_reg != NULL)
     {
-        if (_shift_reg != NULL)
-        {
-            _shift_reg->SetLow(_shutdown_pin);
-        }
-        else
+        _shift_reg->SetLow(_shutdown_pin);
+    }
+    else
+    {
+        if (_shutdown_pin != NULL)
         {
             pinMode(_shutdown_pin, OUTPUT);
             digitalWrite(_shutdown_pin, LOW);
@@ -52,14 +52,14 @@ bool VL53L0X::begin(bool io_2v8)
     bool spad_type_is_aperture;
 
     /* enable the sensor */
-    if (_shutdown_pin != NULL)
+    if (_shift_reg != NULL)
     {
-        if (_shift_reg != NULL)
-        {
-            _shift_reg->SetHigh(_shutdown_pin);
-            delay(2);
-        }
-        else
+        _shift_reg->SetHigh(_shutdown_pin);
+        delay(2);
+    }
+    else
+    {
+        if (_shutdown_pin != NULL)
         {
             digitalWrite(_shutdown_pin, HIGH);
             delay(2);
@@ -515,7 +515,7 @@ void VL53L0X::stopContinuous()
     writeReg(0xFF, 0x00);
 }
 
-uint16_t VL53L0X::readRangeContinuousMillimeters()
+uint16_t VL53L0X::readRangeContinuousMillimeters(void (*functionPointer)())
 {
     while ((readReg(VL53L0X_RESULT_INTERRUPT_STATUS) & 0x07) == 0)
     {
@@ -523,6 +523,10 @@ uint16_t VL53L0X::readRangeContinuousMillimeters()
         {
             _did_timeout = true;
             return _previousRange;
+        }
+        if (functionPointer != NULL)
+        {
+            functionPointer();
         }
     }
     /*  assumptions: Linearity Corrective Gain is 1000 (default);
