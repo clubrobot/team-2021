@@ -28,7 +28,7 @@ def start(args):
     from setups.setup_robot_name import ROBOT_ID, BORNIBUS_ID, R128_ID
     if ROBOT_ID == BORNIBUS_ID:
         print("BORNIBUS")
-        from robots.Bornibus.Bornibus import Bornibus
+        from robots.bornibus.bornibus import Bornibus
         auto = Bornibus(man, timelimit=100)
 
     elif ROBOT_ID == R128_ID:
