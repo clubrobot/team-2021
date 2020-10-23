@@ -111,7 +111,10 @@ class Bornibus(RobotBehavior):
     def positioning(self):
         """This optionnal function can be useful to do a small move after setting up the postion during the preparation phase
         """
-        pass
+        if self.side == RobotBehavior.YELLOW_SIDE:
+            wheeledbase.goto(*geogebra.get('PositionningYellow'), -pi/2)
+        else:
+            wheeledbase.goto(*geogebra.get('PositionningBlue'), pi/2)
 
 
 if __name__ == '__main__':
@@ -122,5 +125,7 @@ if __name__ == '__main__':
         robot.set_side(COLOR)
         init_robot()
         robot.set_position()
+        input()
+        robot.positioning()
         input()
         robot.start()
