@@ -368,7 +368,7 @@ class AviodanceBehaviour(Thread):
 
         self.wheeledbase.lookahead.set(150)
         self.wheeledbase.lookaheadbis.set(150)
-        self.wheeledbase.max_linvel.set(200)
+        self.wheeledbase.max_linvel.set(600)
         self.wheeledbase.max_angvel.set(6.0)
         self.wheeledbase.linpos_threshold.set(
             linpos_threshold or default_linpos_threshold)
