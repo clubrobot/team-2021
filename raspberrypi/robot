@@ -28,12 +28,12 @@ def start(args):
     if ROBOT_ID == BORNIBUS_ID:
         print("BORNIBUS")
         from robots.Bornibus.Bornibus import Bornibus
-        auto = Bornibus()
+        auto = Bornibus(man, timelimit=100)
 
     elif ROBOT_ID == R128_ID:
         print("R128")
         from robots.R128.R128 import R128
-        auto = R128()
+        auto = R128(man, timelimit=100)
 
     else:
         print("NOT ON A ROBOT")
