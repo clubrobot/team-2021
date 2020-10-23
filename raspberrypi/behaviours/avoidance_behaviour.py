@@ -253,6 +253,7 @@ class AviodanceBehaviour(Thread):
                         self.logger(INFO, "No Obstacle !",)
 
                 else:
+                # NOT CURRENTLY TESTED ON REAL ROBOT, use BEHAVIOUR_STOPPING instead
                     if self.on_brother_moving_event.is_set():
                         self.logger(INFO, "Brother is moving ...", pos=self.position_listener.get_position(
                             PositionListener.BROTHER))
