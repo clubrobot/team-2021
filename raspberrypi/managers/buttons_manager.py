@@ -81,10 +81,7 @@ class ButtonsManager:
 
     def ready_stage(self):
         self.logger(INFO, "Robot Ready !")
-        if self.auto.master.is_active():
-            ssd.set_message("ready.")
-        else:
-            ssd.set_message("ready")
+        ssd.set_message("ready")
         self.tirette.set_function(
             Thread(target=self.run_match, daemon=True).start)
         self.tirette.set_active_high(False)
