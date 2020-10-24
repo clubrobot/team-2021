@@ -52,7 +52,7 @@ class Bornibus(RobotBehavior):
         if(self.automatestep < len(self.automate)):
             action = self.automate[self.automatestep]
         else:
-            self.display.love()
+            self.display.love(100)
             self.stop_event.set()
             return None, (self,), {}, (None, None)
 
@@ -115,6 +115,12 @@ class Bornibus(RobotBehavior):
             wheeledbase.goto(*geogebra.get('PositionningYellow'), -pi/2)
         else:
             wheeledbase.goto(*geogebra.get('PositionningBlue'), pi/2)
+
+    def start_procedure(self):
+        """This action is launched at the beggining of the match
+        """
+        self.display.start()
+        self.display.love()
 
 
 if __name__ == '__main__':
