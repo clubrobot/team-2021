@@ -92,14 +92,14 @@ class Bornibus(RobotBehavior):
         self.push4 = PushCupAction(geogebra, self.side, 4)
         self.harbour = Harbour(geogebra, self.side)
 
-        # self.automate = [
-        #     self.wind,
-        #     self.push1,
-        #     self.push2,
-        #     self.push3,
-        #     self.push4,
-        #     self.harbour
-        # ]
+        self.automate = [
+            self.wind,
+            self.push1,
+            self.push2,
+            # self.push3,
+            # self.push4,
+            self.harbour
+        ]
 
     def set_position(self):
         """This function apply the starting position of the robot reagading to the choosed side
