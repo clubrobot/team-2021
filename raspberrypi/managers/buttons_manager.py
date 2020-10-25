@@ -84,7 +84,7 @@ class ButtonsManager:
         ssd.set_message("ready")
         self.tirette.set_function(
             Thread(target=self.run_match, daemon=True).start)
-        self.tirette.set_active_high(False)
+        self.tirette.set_active_high(True)
 
     def run_match(self):
         self.logger(INFO, "MATCH LAUNCHED !!!")
