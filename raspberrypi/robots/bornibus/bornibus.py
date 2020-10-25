@@ -36,6 +36,7 @@ class Bornibus(RobotBehavior):
 
         self.wheeledbase = wheeledbase
         self.display = display
+        self.actionneur = actionneur
 
         self.automate = []
 
@@ -125,7 +126,7 @@ class Bornibus(RobotBehavior):
     def stop_match(self):
         import time
         time.sleep(95)
-        # self.actionneur.raise_flag()
+        self.actionneur.raise_flag()
         time.sleep(4)
         wheeledbase.stop()
         self.display.love(duration=1000)

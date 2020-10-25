@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from common.serialutils import Deserializer
-from daughter_cards.arduino import ArduinoLocal, INT, BYTE
+from daughter_cards.arduino import Arduino, INT, BYTE
 import time
 
 # Instructions
@@ -19,15 +19,16 @@ GET_FLAG_POSITION_OPCODE = 0x19
 CALIBRATE_ELEVATOR_OPCODE = 0x20
 CALIBRATE_FLAG_OPCODE = 0x21
 
-class Actionneur(ArduinoLocal):
 
-    #def __init__(self, uuid='/dev/arduino/Actionneur'):
-    def __init__(self, uuid='/dev/ttyUSB0'):
-        ArduinoLocal.__init__(self, uuid)
+class Actionneur(Arduino):
+
+    # def __init__(self, uuid='/dev/arduino/Actionneur'):
+    def __init__(self, parent, uuid='/dev/arduino/Actionneur'):
+        Arduino.__init__(self, parent, uuid)
 
     def move_elevator(self, id, height):
         self.send(MOVE_ELEVATOR_OPCODE, BYTE(id), BYTE(height))
-    
+
     def get_elevator_position(self, id):
         pos_elevator = self.execute(GET_ELEVATOR_POSITION_OPCODE, BYTE(id))
         return pos_elevator.read(BYTE)
@@ -52,7 +53,7 @@ class Actionneur(ArduinoLocal):
 
     def lower_flag(self):
         self.send(LOWER_FLAG_OPCODE)
-    
+
     def get_flag_position(self):
         pos_flag = self.execute(GET_FLAG_POSITION_OPCODE)
         return pos_flag.read(BYTE)
@@ -63,8 +64,9 @@ class Actionneur(ArduinoLocal):
     def calibrate_flag(self):
         self.send(CALIBRATE_FLAG_OPCODE)
 
-if __name__ == "__main__":
-    #from setups.setup_serialtalks import *
 
-    s = Actionneur()
+if __name__ == "__main__":
+    from setups.setup_serialtalks import *
+
+    s = Actionneur(manager)
     s.connect()
