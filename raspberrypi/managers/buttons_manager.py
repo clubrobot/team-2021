@@ -108,7 +108,8 @@ class ButtonsManager:
         self.blue = LightButtonProxy(manager, self.BLUE_PIN, self.BLUE_LIGHT)
         self.orange = LightButtonProxy(
             manager, self.ORANGE_PIN, self.ORANGE_LIGHT)
-        self.tirette = SwitchProxy(manager, self.TIRETTE_PIN)
+        self.tirette = SwitchProxy(
+            manager, self.TIRETTE_PIN, active_high=False)
         self.urgency = SwitchProxy(
             manager, self.URGENCY_PIN, active_high=False)
 
