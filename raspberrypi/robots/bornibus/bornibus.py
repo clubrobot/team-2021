@@ -125,7 +125,7 @@ class Bornibus(RobotBehavior):
 
 if __name__ == '__main__':
     if PREPARATION:
-        Bornibus().start_preparation()
+        Bornibus(manager).start_preparation()
     else:
         robot = Bornibus(manager)
         robot.set_side(COLOR)
