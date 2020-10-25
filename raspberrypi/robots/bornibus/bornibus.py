@@ -8,6 +8,7 @@ from robots.bornibus.actions.wind_action import WindAction
 from robots.bornibus.actions.push_cup_action import PushCupAction
 from robots.bornibus.actions.harbour_action import Harbour
 from math import pi
+from threading import Semaphore
 COLOR = RobotBehavior.YELLOW_SIDE
 PREPARATION = False
 
@@ -41,6 +42,8 @@ class Bornibus(RobotBehavior):
         self.automate = []
 
         self.automatestep = 0
+
+        self.p = Semaphore(0)
 
     def make_decision(self):
         """This function make a decision to choose the next action to play. Today it basically return th next action on list
@@ -123,6 +126,11 @@ class Bornibus(RobotBehavior):
         Thread(target=self.stop_match).start()
         self.display.start()
 
+    def stop_procedure(self):
+        """Optionnal function running at the end of match. Usually used to check if the funny action is end
+        """
+        self.p.acquire(blocking=True)
+
     def stop_match(self):
         import time
         time.sleep(95)
@@ -130,6 +138,7 @@ class Bornibus(RobotBehavior):
         time.sleep(4)
         wheeledbase.stop()
         self.display.love(duration=1000)
+        self.p.release()
         manager.end_game()
 
 
