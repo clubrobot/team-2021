@@ -17,10 +17,10 @@ class WindAction(Action):
 
         if self.color == RobotBehavior.YELLOW_SIDE:
             self.actionpoint = geo.get('WindYellow')
-            self.orientation = -pi/2
+            self.orientation = -pi
         else:
             self.actionpoint = geo.get('WindBlue')
-            self.orientation = pi/2
+            self.orientation = pi
 
         self.actionpoint_precision = 10
 
@@ -28,7 +28,14 @@ class WindAction(Action):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
         self.logger(INFO, 'Go to Wind action ')
 
-        robot.wheeledbase.turnonthespot(self.orientation)
+        # Deploy arm
+        # sleep(1)
+
+        if self.color == RobotBehavior.YELLOW_SIDE:
+            robot.wheeledbase.turnonthespot(-pi/2)
+        else:
+            robot.wheeledbase.turnonthespot(pi/2)
+
         robot.wheeledbase.wait()
 
         x_in, y_in, theta_in = robot.wheeledbase.get_position()
@@ -37,9 +44,6 @@ class WindAction(Action):
             x_sp, y_sp, theta_sp = x_in, y_in - 500, theta_in
         else:
             x_sp, y_sp, theta_sp = x_in, y_in + 500, theta_in
-
-        # Deploy arm
-        # sleep(1)
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
 
