@@ -239,12 +239,12 @@ class RobotBehavior:
             self.stop()
             self.get(start)
             self.whitelist.add(id(current_thread()))
+            self.stop_procedure()
 
     def stop(self):
         """Stop the robot
         """
         self.logger(INFO, 'Stop match')
-        self.perform(self.stop_procedure, timelimit=False)
         self.stop_event.set()
 
     def get_elapsed_time(self):
