@@ -7,6 +7,7 @@ from common.serialtalks import *
 from common.tcptalks import ForeverAloneError
 from common.components import Manager, Server
 from daughter_cards.display import SevenSegments
+from logs.log_manager import *
 import os
 
 DEV_MODE = True
@@ -27,13 +28,13 @@ def start(args):
     from setups.setup_robot_name import ROBOT_ID, BORNIBUS_ID, R128_ID
     if ROBOT_ID == BORNIBUS_ID:
         print("BORNIBUS")
-        from robots.Bornibus.Bornibus import Bornibus
-        auto = Bornibus()
+        from robots.bornibus.bornibus import Bornibus
+        auto = Bornibus(man, timelimit=100)
 
     elif ROBOT_ID == R128_ID:
         print("R128")
         from robots.R128.R128 import R128
-        auto = R128()
+        auto = R128(man, timelimit=100)
 
     else:
         print("NOT ON A ROBOT")
@@ -43,8 +44,7 @@ def start(args):
         auto.start_preparation()
     except Exception as e:
         import traceback
-        auto.log(traceback.format_exc())
-        auto.log.close()
+        auto.logger(ERROR, traceback.format_exc())
         auto.wheeledbase.stop()
 
 

@@ -4,6 +4,7 @@ from common.components import LightButtonProxy, SwitchProxy
 from threading import Semaphore
 from logs.log_manager import *
 
+
 class ButtonsManager:
     RED_PIN = 18  # 1
     RED_LIGHT = 23
@@ -27,21 +28,21 @@ class ButtonsManager:
         self.logger(INFO, "Team Stage")
         ssd.set_message("set team")
         self.blue.set_function(
-            Thread(target=self.set_team_purple, daemon=True).start)
+            Thread(target=self.set_team_blue, daemon=True).start)
         self.orange.set_function(
             Thread(target=self.set_team_yellow, daemon=True).start)
 
     def set_team_yellow(self):
         self.logger(INFO, "Yellow Team")
-        self.side = RobotBehavior.YELLO_SIDE
-        ssd.set_message("team : o")
+        self.side = RobotBehavior.YELLOW_SIDE
+        ssd.set_message("team : y")
         self.green.set_function(
             Thread(target=self.odometry_stage, daemon=True).start)
 
-    def set_team_purple(self):
-        self.logger(INFO, "Purple Team")
+    def set_team_blue(self):
+        self.logger(INFO, "Blue Team")
         self.side = RobotBehavior.BLUE_SIDE
-        ssd.set_message("team : m")
+        ssd.set_message("team : b")
         self.green.set_function(
             Thread(target=self.odometry_stage, daemon=True).start)
 
@@ -80,13 +81,10 @@ class ButtonsManager:
 
     def ready_stage(self):
         self.logger(INFO, "Robot Ready !")
-        if self.auto.master.is_active():
-            ssd.set_message("ready.")
-        else:
-            ssd.set_message("ready")
+        ssd.set_message("ready")
         self.tirette.set_function(
             Thread(target=self.run_match, daemon=True).start)
-        self.tirette.set_active_high(False)
+        self.tirette.set_active_high(True)
 
     def run_match(self):
         self.logger(INFO, "MATCH LAUNCHED !!!")
@@ -97,7 +95,7 @@ class ButtonsManager:
         self.orange.close()
         self.green.close()
 
-        Thread(target=self.auto.run(), daemon=True).start()
+        Thread(target=self.auto.start(), daemon=True).start()
         self.p.release()
 
     def __init__(self, auto):
@@ -110,7 +108,8 @@ class ButtonsManager:
         self.blue = LightButtonProxy(manager, self.BLUE_PIN, self.BLUE_LIGHT)
         self.orange = LightButtonProxy(
             manager, self.ORANGE_PIN, self.ORANGE_LIGHT)
-        self.tirette = SwitchProxy(manager, self.TIRETTE_PIN)
+        self.tirette = SwitchProxy(
+            manager, self.TIRETTE_PIN, active_high=False)
         self.urgency = SwitchProxy(
             manager, self.URGENCY_PIN, active_high=False)
 

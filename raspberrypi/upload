@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rasp_root="~/git/team-2020/"
+rasp_root="~/git/team-2021/"
 
 # check arguments number and types.
 if [ $# -ne 2 ] && [ $# -ne 1 ]
@@ -55,12 +55,12 @@ echo Ok, Sending to $hostname...
 IFS=':'; read -a path_elements <<<"$PATH"
 for link in ${path_elements[*]}
     do
-    if [[ $link =~ .+team-2020.* ]]
+    if [[ $link =~ .+team-2021.* ]]
         then
         local_root=$link
     fi
 done
-local_root=$(echo $local_root | sed 's/\/team-2020\/raspberrypi/\//')
+local_root=$(echo $local_root | sed 's/\/team-2021\/raspberrypi/\//')
 
 # Looking for newest file to upload
 local_root_formated=$(echo $local_root | sed 's/\//\\\//g')
@@ -69,7 +69,7 @@ readarray -t files_liste <<<$files
 file_selected=$(ls -t ${files_liste[@]} | head -n 1)
 
 # Sending
-file_upload=$(echo $file_selected | sed 's/.*\/team-2020\///')
+file_upload=$(echo $file_selected | sed 's/.*\/team-2021\///')
 
 echo $file_selected $hostname@$ip:$rasp_root$file_upload
 

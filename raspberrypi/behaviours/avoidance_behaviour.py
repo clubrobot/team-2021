@@ -8,14 +8,14 @@ from listeners.sensor_listener import *
 from common.roadmap import intersect
 from logs.log_manager import *
 import math
+import time
 
 
 class AviodanceBehaviour(Thread):
 
     # Avoiding behaviour
     BEHAVIOUR_STOPPING = 0
-    BEHAVIOUR_AVOID_ROADMAP = 1
-    BEHAVIOUR_AVOID_POTENTIAL_FIELD = 2
+    BEHAVIOUR_AVOID = 1
     # TODO : Add new behaviour here
 
     # Avoiding detection style
@@ -25,6 +25,10 @@ class AviodanceBehaviour(Thread):
     # Direction
     FORWARD = 1
     BACKWARD = -1
+
+    # State
+    INIT = 0
+    RUN = 1
 
     def __init__(self, wheeledbase, roadmap, beacon_client, sensors, behaviour=BEHAVIOUR_STOPPING, timestep=0.1, exec_param=Logger.SHOW, log_level=INFO):
         """
@@ -40,6 +44,9 @@ class AviodanceBehaviour(Thread):
         # Create path
         self.path = None
 
+        # Internal state
+        self.state = self.INIT
+
         # Default direction
         self.direction = self.FORWARD
 
@@ -49,7 +56,8 @@ class AviodanceBehaviour(Thread):
         self.on_opponentB_moving_event = Event()
 
         self.on_left_event = Event()
-        self.on_front_event = Event()
+        self.on_mid_left_event = Event()
+        self.on_mid_right_event = Event()
         self.on_right_event = Event()
 
         self.abort = Event()
@@ -63,7 +71,8 @@ class AviodanceBehaviour(Thread):
         self.on_opponentB_moving_event.clear()
 
         self.on_left_event.clear()
-        self.on_front_event.clear()
+        self.on_mid_left_event.clear()
+        self.on_mid_right_event.clear()
         self.on_right_event.clear()
 
         # Bind behaviour wheeledbase and beacon client
@@ -74,13 +83,21 @@ class AviodanceBehaviour(Thread):
         self.behaviour = behaviour
         self.timestep = timestep  # Seconds
 
+        # subscribe to the sensors topic
+        # try:
+        #     ret = self.sensors.subscribeSensors()
+        #     self.logger(INFO, 'Subscribe to the sensors topics', status=ret)
+        # except:
+        #     self.logger(
+        #         CRITICAL, 'Cannot subsribe to the topic handler, no opponent detection')
+
         # Instanciate position listener
         self.position_listener = PositionListener(
             self.beacon_client.get_brother_pos, self.beacon_client.get_opponents_pos)
 
         # Instanciate Sensors listener
         self.sensor_listener = SensorListener(
-            self._front_sensor_wrapper, self._left_sensor_wrapper, self._right_sensor_wrapper)
+            self._left_sensor_wrapper, self._mid_left_sensor_wrapper, self._mid_right_sensor_wrapper, self._right_sensor_wrapper, threshold=300)
 
         # Bind internal event generator
         self.position_listener.bind(
@@ -93,7 +110,9 @@ class AviodanceBehaviour(Thread):
         self.sensor_listener.bind(
             SensorListener.LEFT, self._on_left_obstacle)
         self.sensor_listener.bind(
-            SensorListener.FRONT, self._on_front_obstacle)
+            SensorListener.MID_LEFT, self._on_mid_left_obstacle)
+        self.sensor_listener.bind(
+            SensorListener.MID_RIGHT, self._on_mid_right_obstacle)
         self.sensor_listener.bind(
             SensorListener.RIGHT, self._on_right_obstacle)
 
@@ -120,27 +139,36 @@ class AviodanceBehaviour(Thread):
             Always return left sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return 1000, 1000
+            return self.sensors.get_range_left_front()
         else:
-            return 1000, 1000
+            return self.sensors.get_range_left_back()
 
-    def _front_sensor_wrapper(self):
+    def _mid_left_sensor_wrapper(self):
         """
-            Always return front sensor value depending to the robot direction
+            Always return mid left sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return 1000, 1000
+            return self.sensors.get_sensor3_range()
         else:
-            return 1000, 1000
+            return self.sensors.get_sensor1_range()
+
+    def _mid_right_sensor_wrapper(self):
+        """
+            Always return mid right sensor value depending to the robot direction
+        """
+        if self.direction == self.FORWARD:
+            return self.sensors.get_sensor4_range()
+        else:
+            return self.sensors.get_sensor2_range()
 
     def _right_sensor_wrapper(self):
         """
             Always return right sensor value depending to the robot direction
         """
         if self.direction == self.FORWARD:
-            return 1000, 1000
+            return self.sensors.get_range_right_front()
         else:
-            return 1000, 1000
+            return self.sensors.get_range_right_back()
 
     def _on_brother_moving(self):
         """
@@ -166,11 +194,17 @@ class AviodanceBehaviour(Thread):
         """
         self.on_left_event.set()
 
-    def _on_front_obstacle(self):
+    def _on_mid_left_obstacle(self):
         """
-            Generate Event on front obstacle
+            Generate Event on mid left obstacle
         """
-        self.on_front_event.set()
+        self.on_mid_left_event.set()
+
+    def _on_mid_right_obstacle(self):
+        """
+            Generate Event on mid right obstacle
+        """
+        self.on_mid_right_event.set()
 
     def _on_right_obstacle(self):
         """
@@ -201,72 +235,104 @@ class AviodanceBehaviour(Thread):
 
     def run(self):
         while not self.stop.is_set():
-            if self.on_brother_moving_event.is_set():
-                self.logger(INFO, "Brother is moving ...", pos=self.position_listener.get_position(
-                    PositionListener.BROTHER))
+            # Check opponents only on running state
+            if self.state == self.RUN:
+                # when the beahaviour is stopping, only stop the robot and wait
+                if self.behaviour == self.BEHAVIOUR_STOPPING:
+                    while self.on_left_event.is_set() or self.on_mid_left_event.is_set() or self.on_mid_right_event.is_set() or self.on_right_event.is_set():
+                        self.logger(WARNING, "Obstacle on my path !")
+                        self.abort.set()
+                        self.on_left_event.clear()
+                        self.on_mid_left_event.clear()
+                        self.on_mid_right_event.clear()
+                        self.on_right_event.clear()
+                        sleep(self.timestep)
 
-                self.friend_obstacle.set_position(
-                    *self.position_listener.get_position(PositionListener.BROTHER))
-                if(self._is_on_my_path(self.friend_obstacle)):
-                    self.abort.set()
+                    if self.abort.is_set():
+                        self.abort.clear()
+                        self.logger(INFO, "No Obstacle !",)
 
-                self.on_brother_moving_event.clear()
+                else:
+                # NOT CURRENTLY TESTED ON REAL ROBOT, use BEHAVIOUR_STOPPING instead
+                    if self.on_brother_moving_event.is_set():
+                        self.logger(INFO, "Brother is moving ...", pos=self.position_listener.get_position(
+                            PositionListener.BROTHER))
 
-            if self.on_opponentA_moving_event.is_set():
-                self.logger(INFO, "OpponentA is moving ...", pos=self.position_listener.get_position(
-                    PositionListener.OPPONENTA))
+                        self.friend_obstacle.set_position(
+                            *self.position_listener.get_position(PositionListener.BROTHER))
+                        if(self._is_on_my_path(self.friend_obstacle)):
+                            self.abort.set()
 
-                self.opp_A_obstacle.set_position(
-                    *self.position_listener.get_position(PositionListener.OPPONENTA))
-                if(self._is_on_my_path(self.opp_A_obstacle)):
-                    self.abort.set()
+                        self.on_brother_moving_event.clear()
 
-                self.on_opponentA_moving_event.clear()
+                    if self.on_opponentA_moving_event.is_set():
+                        self.logger(INFO, "OpponentA is moving ...", pos=self.position_listener.get_position(
+                            PositionListener.OPPONENTA))
 
-            if self.on_opponentB_moving_event.is_set():
-                self.logger(INFO, "OpponentB is moving ...", pos=self.position_listener.get_position(
-                    PositionListener.OPPONENTB))
+                        self.opp_A_obstacle.set_position(
+                            *self.position_listener.get_position(PositionListener.OPPONENTA))
+                        if(self._is_on_my_path(self.opp_A_obstacle)):
+                            self.abort.set()
 
-                self.opp_B_obstacle.set_position(
-                    *self.position_listener.get_position(PositionListener.OPPONENTB))
-                if(self._is_on_my_path(self.opp_B_obstacle)):
-                    self.abort.set()
+                        self.on_opponentA_moving_event.clear()
 
-                self.on_opponentB_moving_event.clear()
+                    if self.on_opponentB_moving_event.is_set():
+                        self.logger(INFO, "OpponentB is moving ...", pos=self.position_listener.get_position(
+                            PositionListener.OPPONENTB))
 
-            if self.on_left_event.is_set():
-                # Compute the obstacle position
+                        self.opp_B_obstacle.set_position(
+                            *self.position_listener.get_position(PositionListener.OPPONENTB))
+                        if(self._is_on_my_path(self.opp_B_obstacle)):
+                            self.abort.set()
 
-                # Get the sensor pos with the wrapper : self._left_sensor_wrapper()
-                # This function return the projected point relative to the center of the robot
-                # Get the wheeledbase position and project point on real map
-                self.logger(INFO, "Obstacle on my left ...",
-                            pos=self.wheeledbase.get_position())
-                # self.sensor_obstacle.set_position(871, 1919)
-                if(self._is_on_my_path(self.sensor_obstacle)):
-                    self.abort.set()
-                self.on_left_event.clear()
+                        self.on_opponentB_moving_event.clear()
 
-            if self.on_front_event.is_set():
-                # Compute the obstacle position
+                    if self.on_left_event.is_set():
+                        # Compute the obstacle position
 
-                if(self._is_on_my_path(self.sensor_obstacle)):
-                    self.abort.set()
-                self.on_left_event.clear()
+                        # Get the sensor pos with the wrapper : self._left_sensor_wrapper()
+                        # This function return the projected point relative to the center of the robot
+                        # Get the wheeledbase position and project point on real map
+                        self.logger(WARNING, "Obstacle on my left ...",
+                                    dist=self._left_sensor_wrapper())
+                        # self.sensor_obstacle.set_position(871, 1919)
+                        if(self._is_on_my_path(self.sensor_obstacle)):
+                            self.abort.set()
+                        self.on_left_event.clear()
 
-            if self.on_right_event.is_set():
-                # Compute the obstacle position
+                    if self.on_mid_left_event.is_set():
+                        # Compute the obstacle position
+                        self.logger(WARNING, "Obstacle on my mid left ...",
+                                    dist=self._mid_left_sensor_wrapper())
+                        if(self._is_on_my_path(self.sensor_obstacle)):
+                            self.abort.set()
+                        self.on_mid_left_event.clear()
 
-                if(self._is_on_my_path(self.sensor_obstacle)):
-                    self.abort.set()
-                self.on_right_event.clear()
+                    if self.on_mid_right_event.is_set():
+                        # Compute the obstacle position
+                        self.logger(WARNING, "Obstacle on my mid right ...",
+                                    dist=self._mid_right_sensor_wrapper())
+                        if(self._is_on_my_path(self.sensor_obstacle)):
+                            self.abort.set()
+                        self.on_mid_right_event.clear()
 
-            sleep(self.timestep)
+                    if self.on_right_event.is_set():
+                        # Compute the obstacle position
+                        self.logger(WARNING, "Obstacle on my right ...",
+                                    dist=self._right_sensor_wrapper())
+                        if(self._is_on_my_path(self.sensor_obstacle)):
+                            self.abort.set()
+                        self.on_right_event.clear()
+
+                sleep(self.timestep)
 
     def move(self, destination, thresholds=(None, None)):
         linpos_threshold, angpos_threshold = thresholds
         default_linpos_threshold = 3
         default_angpos_threshold = 0.1
+
+        # Set state to run
+        self.state = self.RUN
 
         # Pathfinding
         path_not_found = False
@@ -302,7 +368,7 @@ class AviodanceBehaviour(Thread):
 
         self.wheeledbase.lookahead.set(150)
         self.wheeledbase.lookaheadbis.set(150)
-        self.wheeledbase.max_linvel.set(500)
+        self.wheeledbase.max_linvel.set(600)
         self.wheeledbase.max_angvel.set(6.0)
         self.wheeledbase.linpos_threshold.set(
             linpos_threshold or default_linpos_threshold)
@@ -325,10 +391,23 @@ class AviodanceBehaviour(Thread):
                 blocked = True
 
             # If obstacle is on my path abort
-            if self.abort.is_set():
-                self.wheeledbase.stop()
-                self.abort.clear()
-                return False
+            if self.behaviour == self.BEHAVIOUR_STOPPING:
+                if self.abort.is_set():
+                    timeout = time.time() + 5   # 5 seconds timemout
+                    self.wheeledbase.stop()
+                    while self.abort.is_set():
+                        self.logger(INFO, 'Wait ...')
+                        if time.time() > timeout:
+                            self.logger(INFO, 'Timeout ! Retry to move')
+                            return False
+                        sleep(1)
+                    self.logger(INFO, 'Continue ...')
+                    return False
+            else:
+                if self.abort.is_set():
+                    self.wheeledbase.stop()
+                    self.abort.clear()
+                    return False
 
             if blocked:
                 self.logger(INFO, 'Go backward a little')
