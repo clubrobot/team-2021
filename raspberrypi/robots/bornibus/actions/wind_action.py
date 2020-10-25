@@ -28,8 +28,7 @@ class WindAction(Action):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
         self.logger(INFO, 'Go to Wind action ')
 
-        # Deploy arm
-        # sleep(1)
+        robot.actionneur.set_windsock_arm_position(100)
 
         if self.color == RobotBehavior.YELLOW_SIDE:
             robot.wheeledbase.turnonthespot(-pi/2)
@@ -47,5 +46,4 @@ class WindAction(Action):
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
 
-        # UnDeploy arm
-        # sleep(1)
+        robot.actionneur.set_windsock_arm_position(180)
