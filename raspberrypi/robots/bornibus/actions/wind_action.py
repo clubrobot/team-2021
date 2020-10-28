@@ -5,6 +5,7 @@ from math import pi
 
 from behaviours.action.action import *
 from behaviours.robot_behaviour import RobotBehavior
+from behaviours.robot_behaviour import Aviodance
 from logs.log_manager import *
 
 
@@ -20,7 +21,7 @@ class WindAction(Action):
             self.orientation = -pi
         else:
             self.actionpoint = geo.get('WindBlue')
-            self.orientation = pi
+            self.orientation = -pi
 
         self.actionpoint_precision = 10
 
