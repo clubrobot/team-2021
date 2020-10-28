@@ -60,5 +60,7 @@ class PushCupAction(Action):
         robot.wheeledbase.goto(x_in, y_in, theta_in)
         robot.wheeledbase.wait()
 
-        # UnDeploy arm
-        # sleep(1)
+        if self.idx == 1 or self.idx == 2:
+            robot.display.add_points(3)
+        else:
+            robot.display.add_points(2)

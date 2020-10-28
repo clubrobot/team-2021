@@ -7,6 +7,9 @@ from behaviours.avoidance_behaviour import AviodanceBehaviour
 from robots.bornibus.actions.wind_action import WindAction
 from robots.bornibus.actions.push_cup_action import PushCupAction
 from robots.bornibus.actions.harbour_action import Harbour
+from robots.bornibus.actions.activate_lighthouse import ActivateLighthouseAction
+from robots.bornibus.actions.grab_rack_cups import GrabRackCupsAction
+from robots.bornibus.actions.put_rack_cups import PutRackCupsAction
 from math import pi
 from threading import Semaphore
 COLOR = RobotBehavior.YELLOW_SIDE
@@ -94,13 +97,22 @@ class Bornibus(RobotBehavior):
         self.push3 = PushCupAction(geogebra, self.side, 3)
         self.push4 = PushCupAction(geogebra, self.side, 4)
         self.harbour = Harbour(geogebra, self.side)
+        self.lighthouse = ActivateLighthouseAction(geogebra, self.side)
+        self.grab1 = GrabRackCupsAction(geogebra, self.side, 1)
+        self.grab2 = GrabRackCupsAction(geogebra, self.side, 2)
+        self.put1 = PutRackCupsAction(geogebra, self.side, 1)
+        self.put2 = PutRackCupsAction(geogebra, self.side, 2)
 
         self.automate = [
+            #self.lighthouse,
             self.wind,
             self.push1,
             self.push2,
-            # self.push3,
-            # self.push4,
+            self.push3,
+            self.push4,
+            self.grab1,
+            self.put1,
+            self.put2,
             self.harbour
         ]
 

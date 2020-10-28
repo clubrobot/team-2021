@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 from time import sleep
 from math import pi
@@ -8,7 +7,7 @@ from behaviours.robot_behaviour import RobotBehavior
 from logs.log_manager import *
 
 
-class WindAction(Action):
+class ActivateLighthouseAction(Action):
     def __init__(self, geo, color):
 
         self.logger = LogManager().getlogger(self.__class__.__name__, Logger.SHOW, INFO)
@@ -16,38 +15,39 @@ class WindAction(Action):
         self.color = color
 
         if self.color == RobotBehavior.YELLOW_SIDE:
-            self.actionpoint = geo.get('WindYellow')
-            self.orientation = -pi
+            self.actionpoint = geo.get('ActivateLighthouseYellow')
+            self.orientation = pi
         else:
-            self.actionpoint = geo.get('WindBlue')
+            self.actionpoint = geo.get('ActivateLighthouseBlue')
             self.orientation = pi
 
         self.actionpoint_precision = 10
 
     def procedure(self, robot):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
-        self.logger(INFO, 'Go to Wind action ')
+        self.logger(INFO, 'Go to Lighthouse action ')
 
-        robot.actionneur.set_windsock_arm_position(100)
-        sleep(1)
+        robot.actionneur.move_elevator(2,0)
+        robot.actionneur.set_clamp_position(4,20)
 
-        if self.color == RobotBehavior.YELLOW_SIDE:
-            robot.wheeledbase.turnonthespot(-pi/2)
-        else:
-            robot.wheeledbase.turnonthespot(pi/2)
-
+        robot.wheeledbase.turnonthespot(self.orientation)
         robot.wheeledbase.wait()
+        sleep(1)
 
         x_in, y_in, theta_in = robot.wheeledbase.get_position()
 
         if self.color == RobotBehavior.YELLOW_SIDE:
-            x_sp, y_sp, theta_sp = x_in, y_in - 500, theta_in
+            x_sp, y_sp, theta_sp = x_in - 200, y_in, theta_in
         else:
-            x_sp, y_sp, theta_sp = x_in, y_in + 500, theta_in
+            x_sp, y_sp, theta_sp = x_in - 200, y_in, theta_in
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
+        robot.wheeledbase.wait()
 
-        robot.actionneur.set_windsock_arm_position(180)
-        sleep(1)
+        robot.wheeledbase.goto(x_in, y_in, theta_in)
+        robot.wheeledbase.wait()
 
-        robot.display.addPoints(15)
+        robot.actionneur.move_elevator(2,1)
+        robot.actionneur.set_clamp_position(4,110)
+
+        robot.display.add_points(15)
