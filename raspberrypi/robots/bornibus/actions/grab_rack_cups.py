@@ -20,13 +20,13 @@ class GrabRackCupsAction(Action):
             if self.idx == 1:
                 self.orientation = -pi/2
             else:
-                self.orientation = pi
+                self.orientation = -pi
         else:
             self.actionpoint = geo.get('GrabBlue'+str(self.idx))
             if self.idx == 1:
                 self.orientation = pi/2
             else:
-                self.orientation = pi
+                self.orientation = -pi
 
         self.actionpoint_precision = 10
 
@@ -84,12 +84,12 @@ class GrabRackCupsAction(Action):
             if self.idx == 1:
                 x_sp, y_sp, theta_sp = x_in + 150, y_in, pi/2
             else:
-                x_sp, y_sp, theta_sp = x_in, y_in - 150, 0
+                x_sp, y_sp, theta_sp = x_in, y_in - 150, pi
         else:
             if self.idx == 1:
                 x_sp, y_sp, theta_sp = x_in + 150, y_in, -pi/2
             else:
-                x_sp, y_sp, theta_sp = x_in, y_in + 150, 0
+                x_sp, y_sp, theta_sp = x_in, y_in + 150, pi
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
