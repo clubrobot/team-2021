@@ -63,4 +63,4 @@ class PushCupAction(Action):
         if self.idx == 1 or self.idx == 2:
             robot.display.addPoints(3)
         else:
-            robot.display.addPoints(2)
+            robot.display.addPoints(3)
