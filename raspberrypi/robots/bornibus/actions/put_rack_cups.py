@@ -44,9 +44,10 @@ class PutRackCupsAction(Action):
             else:
                 x_sp, y_sp, theta_sp = x_in + 250, y_in, theta_in
 
-        robot.actionneur.move_elevator(0,0)
-        robot.actionneur.move_elevator(1,0)
-        robot.actionneur.move_elevator(2,0)
+        if self.idx == 1:
+            robot.actionneur.move_elevator(0,0)
+            robot.actionneur.move_elevator(1,0)
+            robot.actionneur.move_elevator(2,0)
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()

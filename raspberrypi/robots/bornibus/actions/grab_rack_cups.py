@@ -82,17 +82,29 @@ class GrabRackCupsAction(Action):
 
         if self.color == RobotBehavior.YELLOW_SIDE:
             if self.idx == 1:
-                x_sp, y_sp, theta_sp = x_in + 150, y_in, pi/2
+                x_sp, y_sp, theta_sp = x_in + 150, y_in, theta_in
             else:
-                x_sp, y_sp, theta_sp = x_in, y_in - 150, pi
+                x_sp, y_sp, theta_sp = x_in, y_in - 150, theta_in pi
         else:
             if self.idx == 1:
-                x_sp, y_sp, theta_sp = x_in + 150, y_in, -pi/2
+                x_sp, y_sp, theta_sp = x_in + 150, y_in, theta_in -pi/2
             else:
-                x_sp, y_sp, theta_sp = x_in, y_in + 150, pi
+                x_sp, y_sp, theta_sp = x_in, y_in + 150, theta_in pi
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
+
+        if self.color == RobotBehavior.YELLOW_SIDE:
+            if self.idx == 1:
+                robot.wheeledbase.turnonthespot(pi/2)
+            else:
+                robot.wheeledbase.turnonthespot(pi)
+        else:
+            if self.idx == 1:
+                robot.wheeledbase.turnonthespot(-pi/2)
+            else:
+                robot.wheeledbase.turnonthespot(pi)
+
         #Le robot avance de 250 mm, l'avant face au rack
         x_in, y_in, theta_in = robot.wheeledbase.get_position()
 

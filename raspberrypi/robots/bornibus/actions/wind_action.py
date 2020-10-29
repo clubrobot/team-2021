@@ -35,7 +35,7 @@ class WindAction(Action):
         if self.color == RobotBehavior.YELLOW_SIDE:
             robot.wheeledbase.turnonthespot(-pi/2)
         else:
-            robot.wheeledbase.turnonthespot(pi/2)
+            robot.wheeledbase.turnonthespot(-pi/2)
 
         robot.wheeledbase.wait()
 
