@@ -50,4 +50,4 @@ class ActivateLighthouseAction(Action):
         robot.actionneur.move_elevator(2,1)
         robot.actionneur.set_clamp_position(4,110)
 
-        robot.display.add_points(15)
+        robot.display.addPoints(15)
