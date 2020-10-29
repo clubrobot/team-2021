@@ -61,6 +61,6 @@ class PushCupAction(Action):
         robot.wheeledbase.wait()
 
         if self.idx == 1 or self.idx == 2:
-            robot.display.add_points(3)
+            robot.display.addPoints(3)
         else:
-            robot.display.add_points(2)
+            robot.display.addPoints(2)

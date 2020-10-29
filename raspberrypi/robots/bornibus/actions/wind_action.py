@@ -5,7 +5,7 @@ from math import pi
 
 from behaviours.action.action import *
 from behaviours.robot_behaviour import RobotBehavior
-from behaviours.robot_behaviour import Aviodance
+#from behaviours.robot_behaviour import AviodanceBehaviour
 from logs.log_manager import *
 
 
@@ -51,4 +51,4 @@ class WindAction(Action):
         robot.actionneur.set_windsock_arm_position(180)
         sleep(1)
 
-        robot.display.add_points(15)
+        robot.display.addPoints(15)

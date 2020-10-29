@@ -43,4 +43,4 @@ class Harbour(Action):
     def procedure(self, robot):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
 
-        robot.display.add_points(7)
+        robot.display.addPoints(7)
