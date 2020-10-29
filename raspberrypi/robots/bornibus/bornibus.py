@@ -164,6 +164,17 @@ class Bornibus(RobotBehavior):
         self.p.release()
         manager.end_game()
 
+    def stop_match(self):
+        import time
+        time.sleep(95)
+        self.actionneur.raise_flag()
+        self.display.addPoints(10)
+        time.sleep(4)
+        wheeledbase.stop()
+        self.display.love(duration=1000)
+        self.p.release()
+        manager.end_game()
+
 
 if __name__ == '__main__':
     if PREPARATION:
