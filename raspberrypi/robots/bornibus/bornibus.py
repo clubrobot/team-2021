@@ -12,8 +12,8 @@ from robots.bornibus.actions.grab_rack_cups import GrabRackCupsAction
 from robots.bornibus.actions.put_rack_cups import PutRackCupsAction
 from math import pi
 from threading import Semaphore
-COLOR = RobotBehavior.YELLOW_SIDE
-PREPARATION = False
+COLOR = RobotBehavior.BLUE_SIDE
+PREPARATION = True
 
 
 class Bornibus(RobotBehavior):
@@ -110,9 +110,9 @@ class Bornibus(RobotBehavior):
             self.push2,
             self.push3,
             self.push4,
-            self.grab1,
-            self.put1,
-            self.put2,
+            #self.grab1,
+            #self.put1,
+            #self.put2,
             self.harbour
         ]
 
@@ -142,27 +142,6 @@ class Bornibus(RobotBehavior):
         """Optionnal function running at the end of match. Usually used to check if the funny action is end
         """
         self.p.acquire(blocking=True)
-
-    def stop_match(self):
-        import time
-        time.sleep(95)
-        self.actionneur.raise_flag()
-        time.sleep(4)
-        wheeledbase.stop()
-        self.display.love(duration=1000)
-        self.p.release()
-        manager.end_game()
-
-    def stop_match(self):
-        import time
-        time.sleep(95)
-        self.actionneur.raise_flag()
-        self.display.addPoints(10)
-        time.sleep(4)
-        wheeledbase.stop()
-        self.display.love(duration=1000)
-        self.p.release()
-        manager.end_game()
 
     def stop_match(self):
         import time

@@ -45,30 +45,29 @@ class PutRackCupsAction(Action):
                 x_sp, y_sp, theta_sp = x_in + 250, y_in, theta_in
 
         if self.idx == 1:
-            robot.actionneur.move_elevator(0,0)
-            robot.actionneur.move_elevator(1,0)
+#            robot.actionneur.move_elevator(0,0)
+#            robot.actionneur.move_elevator(1,0)
             robot.actionneur.move_elevator(2,0)
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
-        sleep(3)
+        sleep(2)
 
         #Ouverture des pinces
         if self.idx == 1:
-            robot.actionneur.set_clamp_position(2,110)
-            robot.actionneur.set_clamp_position(3,110)
-            robot.actionneur.set_clamp_position(4,110)
+#            robot.actionneur.set_clamp_position(2,110)
+#            robot.actionneur.set_clamp_position(3,110)
+            robot.actionneur.set_clamp_position(4,90)
         else:     
             robot.actionneur.set_clamp_position(0,70)
-            robot.actionneur.set_clamp_position(1,65)
-
-        sleep(1)  
+            robot.actionneur.set_clamp_position(1,65) 
 
         #Les ascenseurs remontent
         if self.idx == 2:
             robot.actionneur.move_elevator(0,1)
             robot.actionneur.move_elevator(1,1)
             robot.actionneur.move_elevator(2,1)
+
 
         #Le robot recule à sa position de départ
         robot.wheeledbase.goto(x_in, y_in, theta_in)

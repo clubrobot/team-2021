@@ -26,7 +26,7 @@ class Harbour(Action):
         else:
             north = 'NorthBlue'
             south = 'SouthBlue'
-            self.orientation = -pi
+            self.orientation = 0
 
         if self.destination == self.NORTH:
             self.actionpoint = geo.get(north)
