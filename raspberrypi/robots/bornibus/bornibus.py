@@ -3,7 +3,7 @@
 
 from robots.bornibus.setup_bornibus import *
 from behaviours.robot_behaviour import RobotBehavior
-from behaviours.avoidance_behaviour import AvoidanceBehaviour
+from behaviours.avoidance_behaviour import AviodanceBehaviour
 from robots.bornibus.actions.wind_action import WindAction
 from robots.bornibus.actions.push_cup_action import PushCupAction
 from robots.bornibus.actions.harbour_action import Harbour
