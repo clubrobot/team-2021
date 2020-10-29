@@ -97,7 +97,7 @@ class AviodanceBehaviour(Thread):
 
         # Instanciate Sensors listener
         self.sensor_listener = SensorListener(
-            self._left_sensor_wrapper, self._mid_left_sensor_wrapper, self._mid_right_sensor_wrapper, self._right_sensor_wrapper, threshold=300)
+            self._left_sensor_wrapper, self._mid_left_sensor_wrapper, self._mid_right_sensor_wrapper, self._right_sensor_wrapper, threshold=350)
 
         # Bind internal event generator
         self.position_listener.bind(

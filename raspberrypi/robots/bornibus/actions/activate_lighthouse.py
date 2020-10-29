@@ -32,7 +32,7 @@ class ActivateLighthouseAction(Action):
         #robot.actionneur.move_elevator(2,0)
         #robot.actionneur.set_clamp_position(4,70)
         #robot.actionneur.set_clamp_position(3,100)
-        robot.actionneur.set_clamp_position(2,90)
+        robot.actionneur.set_clamp_position(2,40)
         sleep(2)
 
         robot.wheeledbase.turnonthespot(self.orientation)
@@ -42,9 +42,9 @@ class ActivateLighthouseAction(Action):
         x_in, y_in, theta_in = robot.wheeledbase.get_position()
 
         if self.color == RobotBehavior.YELLOW_SIDE:
-            x_sp, y_sp, theta_sp = x_in - 190, y_in, theta_in
+            x_sp, y_sp, theta_sp = x_in - 170, y_in, theta_in
         else:
-            x_sp, y_sp, theta_sp = x_in - 190, y_in, theta_in
+            x_sp, y_sp, theta_sp = x_in - 170, y_in, theta_in
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
