@@ -16,10 +16,10 @@ class ActivateLighthouseAction(Action):
 
         if self.color == RobotBehavior.YELLOW_SIDE:
             self.actionpoint = geo.get('ActivateLighthouseYellow')
-            self.orientation = pi
+            self.orientation = 0
         else:
             self.actionpoint = geo.get('ActivateLighthouseBlue')
-            self.orientation = pi
+            self.orientation = 0
 
         self.actionpoint_precision = 10
 
@@ -27,8 +27,11 @@ class ActivateLighthouseAction(Action):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
         self.logger(INFO, 'Go to Lighthouse action ')
 
-        robot.actionneur.move_elevator(2,0)
-        robot.actionneur.set_clamp_position(4,20)
+        #robot.actionneur.move_elevator(2,0)
+        #robot.actionneur.set_clamp_position(4,70)
+        #robot.actionneur.set_clamp_position(3,100)
+        robot.actionneur.set_clamp_position(2,90)
+        sleep(2)
 
         robot.wheeledbase.turnonthespot(self.orientation)
         robot.wheeledbase.wait()
@@ -47,7 +50,8 @@ class ActivateLighthouseAction(Action):
         robot.wheeledbase.goto(x_in, y_in, theta_in)
         robot.wheeledbase.wait()
 
-        robot.actionneur.move_elevator(2,1)
-        robot.actionneur.set_clamp_position(4,110)
+        robot.actionneur.set_clamp_position(2,40)
+
+        #robot.actionneur.move_elevator(2,1)
 
         robot.display.addPoints(15)
