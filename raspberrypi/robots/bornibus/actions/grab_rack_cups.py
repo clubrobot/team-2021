@@ -84,12 +84,12 @@ class GrabRackCupsAction(Action):
             if self.idx == 1:
                 x_sp, y_sp, theta_sp = x_in + 150, y_in, theta_in
             else:
-                x_sp, y_sp, theta_sp = x_in, y_in - 150, theta_in pi
+                x_sp, y_sp, theta_sp = x_in, y_in - 150, theta_in
         else:
             if self.idx == 1:
-                x_sp, y_sp, theta_sp = x_in + 150, y_in, theta_in -pi/2
+                x_sp, y_sp, theta_sp = x_in + 150, y_in, theta_in
             else:
-                x_sp, y_sp, theta_sp = x_in, y_in + 150, theta_in pi
+                x_sp, y_sp, theta_sp = x_in, y_in + 150, theta_in
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
