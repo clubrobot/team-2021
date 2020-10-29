@@ -104,10 +104,10 @@ class Bornibus(RobotBehavior):
         self.put2 = PutRackCupsAction(geogebra, self.side, 2)
 
         self.automate = [
-            #self.lighthouse,
             self.wind,
             self.push1,
             self.push2,
+            self.lighthouse,
             self.push3,
             self.push4,
             #self.grab1,

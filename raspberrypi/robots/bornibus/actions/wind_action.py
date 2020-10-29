@@ -29,6 +29,8 @@ class WindAction(Action):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
         self.logger(INFO, 'Go to Wind action ')
 
+        robot.wheeledbase.max_linvel.set(300)
+
         if self.color == RobotBehavior.YELLOW_SIDE:
             robot.actionneur.set_windsock_arm_position(100)
             sleep(1)
@@ -59,5 +61,7 @@ class WindAction(Action):
 
         robot.actionneur.set_windsock_arm_position(180)
         sleep(1)
+
+        robot.wheeledbase.max_linvel.set(600)
 
         robot.display.addPoints(15)

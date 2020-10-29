@@ -27,6 +27,8 @@ class ActivateLighthouseAction(Action):
         self.logger(INFO, 'Action is launch on', robot.__class__.__name__)
         self.logger(INFO, 'Go to Lighthouse action ')
 
+        robot.wheeledbase.max_linvel.set(300)
+
         #robot.actionneur.move_elevator(2,0)
         #robot.actionneur.set_clamp_position(4,70)
         #robot.actionneur.set_clamp_position(3,100)
@@ -40,9 +42,9 @@ class ActivateLighthouseAction(Action):
         x_in, y_in, theta_in = robot.wheeledbase.get_position()
 
         if self.color == RobotBehavior.YELLOW_SIDE:
-            x_sp, y_sp, theta_sp = x_in - 200, y_in, theta_in
+            x_sp, y_sp, theta_sp = x_in - 190, y_in, theta_in
         else:
-            x_sp, y_sp, theta_sp = x_in - 200, y_in, theta_in
+            x_sp, y_sp, theta_sp = x_in - 190, y_in, theta_in
 
         robot.wheeledbase.goto(x_sp, y_sp, theta_sp)
         robot.wheeledbase.wait()
@@ -53,5 +55,7 @@ class ActivateLighthouseAction(Action):
         robot.actionneur.set_clamp_position(2,40)
 
         #robot.actionneur.move_elevator(2,1)
+
+        robot.wheeledbase.max_linvel.set(600)
 
         robot.display.addPoints(15)
