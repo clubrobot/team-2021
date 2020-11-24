@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from time import monotonic, sleep
 from threading import Thread, Event, current_thread
 from logs.log_manager import *
 from listeners.end_game_listener import *
 
-class AccessDenied(Exception): pass
+
+class AccessDenied(Exception):
+    pass
+
 
 class RobotBehavior:
     """This class describe the generic beahviour of the robot. How to reach an action point and how to excute the desired action
@@ -20,9 +23,9 @@ class RobotBehavior:
         RuntimeError: Function not override
         RuntimeError: Function not override
     """
-    BLUE_SIDE       = 0
-    YELLO_SIDE      = 1
-    UNDEFINED_SIDE  = -1
+    BLUE_SIDE = 0
+    YELLOW_SIDE = 1
+    UNDEFINED_SIDE = -1
 
     def __init__(self, manager, *args, timelimit=None, exec_param=Logger.SHOW, log_level=INFO, **kwargs):
         """Initialise all the useful object members
@@ -33,11 +36,11 @@ class RobotBehavior:
             exec_param (int, optional): The logger display configuration. Defaults to Logger.SHOW.
             log_level (int, optional): The logger display level. Defaults to INFO.
         """
-        self.manager    = manager
-        self.timelimit  = timelimit
-        self.whitelist  = set()
-        self.blacklist  = set()
-        self.outputs    = dict()
+        self.manager = manager
+        self.timelimit = timelimit
+        self.whitelist = set()
+        self.blacklist = set()
+        self.outputs = dict()
         self.stop_event = Event()
 
         # Keep old manager method
@@ -47,7 +50,8 @@ class RobotBehavior:
         #self.manager.send = self.send
 
         # Init Logger
-        self.logger = LogManager().getlogger(self.__class__.__name__, exec_param, log_level)
+        self.logger = LogManager().getlogger(
+            self.__class__.__name__, exec_param, log_level)
 
     def perform(self, procedure, args=(), kwargs={}, timelimit=True):
         """This method allow the robot to perform an action. It create one thread for the current action and check if this thread is allow to run
@@ -63,6 +67,7 @@ class RobotBehavior:
         """
         thread = Thread(args=args, kwargs=kwargs, daemon=True)
         thread_id = id(thread)
+
         def target(*args, **kwargs):
             try:
                 output = procedure(*args, **kwargs)
@@ -73,10 +78,13 @@ class RobotBehavior:
                 self.outputs[thread_id] = None
                 raise
             finally:
-                if thread_id in self.blacklist: self.blacklist.remove(thread_id)
-                if thread_id in self.whitelist: self.whitelist.remove(thread_id)
+                if thread_id in self.blacklist:
+                    self.blacklist.remove(thread_id)
+                if thread_id in self.whitelist:
+                    self.whitelist.remove(thread_id)
 
-        if not timelimit: self.whitelist.add(thread_id)
+        if not timelimit:
+            self.whitelist.add(thread_id)
         thread._target = target
         thread.start()
         return thread
@@ -208,10 +216,13 @@ class RobotBehavior:
                     continue
                 if location is not None:
                     if location[2] is not None:
-                        self.logger(INFO, 'Goto: ({0[0]:.0f}, {0[1]:.0f}, {0[2]:.2f})'.format(location))
+                        self.logger(
+                            INFO, 'Goto: ({0[0]:.0f}, {0[1]:.0f}, {0[2]:.2f})'.format(location))
                     else:
-                        self.logger(INFO, 'Goto: ({0[0]:.0f}, {0[1]:.0f})'.format(location))
-                    goto = self.perform(self.goto_procedure, args=(location, thresholds))
+                        self.logger(
+                            INFO, 'Goto: ({0[0]:.0f}, {0[1]:.0f})'.format(location))
+                    goto = self.perform(self.goto_procedure,
+                                        args=(location, thresholds))
                     success = self.get(goto)
                 else:
                     success = True
@@ -228,12 +239,12 @@ class RobotBehavior:
             self.stop()
             self.get(start)
             self.whitelist.add(id(current_thread()))
+            self.stop_procedure()
 
     def stop(self):
         """Stop the robot
         """
         self.logger(INFO, 'Stop match')
-        self.perform(self.stop_procedure, timelimit=False)
         self.stop_event.set()
 
     def get_elapsed_time(self):
@@ -258,7 +269,7 @@ if __name__ == "__main__":
     class TakeCup(Action):
         def __init__(self, idx):
             self.idx = idx
-            self.actionpoint = (555, 666)# geogebra.get('Point name')
+            self.actionpoint = (555, 666)  # geogebra.get('Point name')
             self.orientation = pi
             self.actionpoint_precision = 10
 
@@ -269,23 +280,24 @@ if __name__ == "__main__":
 
     class Robot(RobotBehavior):
         def __init__(self, manager, *args, timelimit=None, **kwargs):
-                RobotBehavior.__init__(self, manager, *args, timelimit=timelimit, **kwargs)
+            RobotBehavior.__init__(self, manager, *args,
+                                   timelimit=timelimit, **kwargs)
 
-                take1 = TakeCup(1)
-                take2 = TakeCup(2)
-                take3 = TakeCup(3)
-                take4 = TakeCup(4)
-                take5 = TakeCup(5)
+            take1 = TakeCup(1)
+            take2 = TakeCup(2)
+            take3 = TakeCup(3)
+            take4 = TakeCup(4)
+            take5 = TakeCup(5)
 
-                self.automate = [
-                    take1,
-                    take2,
-                    take3,
-                    take4,
-                    take5
-                    ]
+            self.automate = [
+                take1,
+                take2,
+                take3,
+                take4,
+                take5
+            ]
 
-                self.automatestep = 0
+            self.automatestep = 0
 
         def make_decision(self):
             if(self.automatestep < len(self.automate)):

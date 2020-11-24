@@ -66,7 +66,7 @@ int AX12::turn(int Speed){
 		return Dynamixel.turn(m_id, 0, spd);
 	}
 	else{
-		int spd = max(-1023, Speed);
+		int spd = MIN(1023, (Speed*-1));
 		return Dynamixel.turn(m_id, 1, spd);
 	}
 }

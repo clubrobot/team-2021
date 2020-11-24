@@ -6,11 +6,14 @@ from setups.setup_logger import *
 from setups.setup_serialtalks import *
 from setups.setup_wheeledbase import *
 from setups.setup_roadmap import *
-#from setups.setup_display import *
+from setups.setup_display import *
 from setups.setup_sensors import *
 from setups.setup_beacons import *
+from daughter_cards.actionneur import *
 
 geogebra, roadmap = init_roadmap(ROBOT_ID, BORNIBUS_ID)
+
+actionneur = Actionneur(manager)
 
 
 def init_robot():
