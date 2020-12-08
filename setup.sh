@@ -129,11 +129,13 @@ if [ -z "$ARDMK_DIR" ]; then # ifndef ARDMK_DIR
 		sudo apt-get install libxml2-dev
 
 		sudo pip3 install python-igraph
+		
+		sudo pip3 install transformations
 
 		sudo apt-get install doxygen
 
 		sudo apt-get install texlive-font-utils
-
+		
 
 		echo export ARDMK_DIR="/usr/share/arduino" >> "$PROFILE"
 	else
